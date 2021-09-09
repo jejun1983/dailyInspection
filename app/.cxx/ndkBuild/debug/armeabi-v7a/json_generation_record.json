@@ -5,7 +5,7 @@
   },
   {
     "level": "INFO",
-    "message": "rebuilding JSON /Users/jjbae/Desktop/backup/volunteer/app/.cxx/ndkBuild/debug/armeabi-v7a/android_gradle_build.json due to:"
+    "message": "rebuilding JSON /Users/jjbae/Desktop/backup/dailyInspection/app/.cxx/ndkBuild/debug/armeabi-v7a/android_gradle_build.json due to:"
   },
   {
     "level": "INFO",
@@ -13,19 +13,19 @@
   },
   {
     "level": "INFO",
-    "message": "removing stale contents from \u0027/Users/jjbae/Desktop/backup/volunteer/app/.cxx/ndkBuild/debug/armeabi-v7a\u0027"
+    "message": "removing stale contents from \u0027/Users/jjbae/Desktop/backup/dailyInspection/app/.cxx/ndkBuild/debug/armeabi-v7a\u0027"
   },
   {
     "level": "INFO",
-    "message": "created folder \u0027/Users/jjbae/Desktop/backup/volunteer/app/.cxx/ndkBuild/debug/armeabi-v7a\u0027"
+    "message": "created folder \u0027/Users/jjbae/Desktop/backup/dailyInspection/app/.cxx/ndkBuild/debug/armeabi-v7a\u0027"
   },
   {
     "level": "INFO",
-    "message": "executing ndkBuild Executable : /Users/jjbae/Desktop/work/SDK/ndk/21.3.6528147/ndk-build\narguments : \nNDK_PROJECT_PATH\u003dnull\nAPP_BUILD_SCRIPT\u003d/Users/jjbae/Desktop/backup/volunteer/app/src/main/jni/Android.mk\nAPP_ABI\u003darmeabi-v7a\nNDK_ALL_ABIS\u003darmeabi-v7a\nNDK_DEBUG\u003d1\nAPP_PLATFORM\u003dandroid-19\nNDK_OUT\u003d/Users/jjbae/Desktop/backup/volunteer/app/build/intermediates/ndkBuild/debug/obj\nNDK_LIBS_OUT\u003d/Users/jjbae/Desktop/backup/volunteer/app/build/intermediates/ndkBuild/debug/lib\nAPP_SHORT_COMMANDS\u003dfalse\nLOCAL_SHORT_COMMANDS\u003dfalse\n-B\n-n\njvmArgs : \n\n"
+    "message": "executing ndkBuild Executable : /Users/jjbae/Desktop/work/SDK/ndk/21.3.6528147/ndk-build\narguments : \nNDK_PROJECT_PATH\u003dnull\nAPP_BUILD_SCRIPT\u003d/Users/jjbae/Desktop/backup/dailyInspection/app/src/main/jni/Android.mk\nAPP_ABI\u003darmeabi-v7a\nNDK_ALL_ABIS\u003darmeabi-v7a\nNDK_DEBUG\u003d1\nAPP_PLATFORM\u003dandroid-19\nNDK_OUT\u003d/Users/jjbae/Desktop/backup/dailyInspection/app/build/intermediates/ndkBuild/debug/obj\nNDK_LIBS_OUT\u003d/Users/jjbae/Desktop/backup/dailyInspection/app/build/intermediates/ndkBuild/debug/lib\nAPP_SHORT_COMMANDS\u003dfalse\nLOCAL_SHORT_COMMANDS\u003dfalse\n-B\n-n\njvmArgs : \n\n"
   },
   {
     "level": "INFO",
-    "message": "Executable : /Users/jjbae/Desktop/work/SDK/ndk/21.3.6528147/ndk-build\narguments : \nNDK_PROJECT_PATH\u003dnull\nAPP_BUILD_SCRIPT\u003d/Users/jjbae/Desktop/backup/volunteer/app/src/main/jni/Android.mk\nAPP_ABI\u003darmeabi-v7a\nNDK_ALL_ABIS\u003darmeabi-v7a\nNDK_DEBUG\u003d1\nAPP_PLATFORM\u003dandroid-19\nNDK_OUT\u003d/Users/jjbae/Desktop/backup/volunteer/app/build/intermediates/ndkBuild/debug/obj\nNDK_LIBS_OUT\u003d/Users/jjbae/Desktop/backup/volunteer/app/build/intermediates/ndkBuild/debug/lib\nAPP_SHORT_COMMANDS\u003dfalse\nLOCAL_SHORT_COMMANDS\u003dfalse\n-B\n-n\njvmArgs : \n\n"
+    "message": "Executable : /Users/jjbae/Desktop/work/SDK/ndk/21.3.6528147/ndk-build\narguments : \nNDK_PROJECT_PATH\u003dnull\nAPP_BUILD_SCRIPT\u003d/Users/jjbae/Desktop/backup/dailyInspection/app/src/main/jni/Android.mk\nAPP_ABI\u003darmeabi-v7a\nNDK_ALL_ABIS\u003darmeabi-v7a\nNDK_DEBUG\u003d1\nAPP_PLATFORM\u003dandroid-19\nNDK_OUT\u003d/Users/jjbae/Desktop/backup/dailyInspection/app/build/intermediates/ndkBuild/debug/obj\nNDK_LIBS_OUT\u003d/Users/jjbae/Desktop/backup/dailyInspection/app/build/intermediates/ndkBuild/debug/lib\nAPP_SHORT_COMMANDS\u003dfalse\nLOCAL_SHORT_COMMANDS\u003dfalse\n-B\n-n\njvmArgs : \n\n"
   },
   {
     "level": "INFO",
@@ -33,7 +33,7 @@
   },
   {
     "level": "INFO",
-    "message": "write build output /Users/jjbae/Desktop/backup/volunteer/app/.cxx/ndkBuild/debug/armeabi-v7a/build_output.txt"
+    "message": "write build output /Users/jjbae/Desktop/backup/dailyInspection/app/.cxx/ndkBuild/debug/armeabi-v7a/build_output.txt"
   },
   {
     "level": "INFO",
@@ -41,7 +41,7 @@
   },
   {
     "level": "INFO",
-    "message": "write command file /Users/jjbae/Desktop/backup/volunteer/app/.cxx/ndkBuild/debug/armeabi-v7a/build_command.txt"
+    "message": "write command file /Users/jjbae/Desktop/backup/dailyInspection/app/.cxx/ndkBuild/debug/armeabi-v7a/build_command.txt"
   },
   {
     "level": "INFO",

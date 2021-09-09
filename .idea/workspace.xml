@@ -14,13 +14,104 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c2f91a9e-f5a2-4b35-a109-52e90355f049" name="Default Changelist" comment="[jjbae]&#10;&#10;1. 상용 빌드" />
+    <list default="true" id="c2f91a9e-f5a2-4b35-a109-52e90355f049" name="Default Changelist" comment="[jjbae]&#10;&#10;1. 상용 빌드">
+      <change beforePath="$PROJECT_DIR$/.gradle/5.4.1/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.4.1/executionHistory/executionHistory.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/5.4.1/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.4.1/executionHistory/executionHistory.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/5.4.1/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.4.1/fileHashes/fileHashes.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/5.4.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.4.1/fileHashes/fileHashes.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/5.4.1/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.4.1/fileHashes/resourceHashesCache.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/5.4.1/javaCompile/classAnalysis.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.4.1/javaCompile/classAnalysis.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/5.4.1/javaCompile/jarAnalysis.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.4.1/javaCompile/jarAnalysis.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/5.4.1/javaCompile/javaCompile.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.4.1/javaCompile/javaCompile.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/5.4.1/javaCompile/taskHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.4.1/javaCompile/taskHistory.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules/app/dailyInspection.app.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/app/dailyInspection.app.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules/mlAPI/dailyInspection.mlAPI.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/mlAPI/dailyInspection.mlAPI.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/arm64-v8a/android_gradle_build.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/arm64-v8a/android_gradle_build.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/arm64-v8a/android_gradle_build_mini.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/arm64-v8a/android_gradle_build_mini.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/arm64-v8a/android_gradle_build_public_keys_arm64-v8a.command.txt" beforeDir="false" afterPath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/arm64-v8a/android_gradle_build_public_keys_arm64-v8a.command.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/arm64-v8a/build_command.txt" beforeDir="false" afterPath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/arm64-v8a/build_command.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/arm64-v8a/build_model.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/arm64-v8a/build_model.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/arm64-v8a/build_output.txt" beforeDir="false" afterPath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/arm64-v8a/build_output.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/arm64-v8a/json_generation_record.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/arm64-v8a/json_generation_record.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/armeabi-v7a/android_gradle_build.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/armeabi-v7a/android_gradle_build.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/armeabi-v7a/android_gradle_build_mini.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/armeabi-v7a/android_gradle_build_mini.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/armeabi-v7a/android_gradle_build_public_keys_armeabi-v7a.command.txt" beforeDir="false" afterPath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/armeabi-v7a/android_gradle_build_public_keys_armeabi-v7a.command.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/armeabi-v7a/build_command.txt" beforeDir="false" afterPath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/armeabi-v7a/build_command.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/armeabi-v7a/build_model.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/armeabi-v7a/build_model.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/armeabi-v7a/build_output.txt" beforeDir="false" afterPath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/armeabi-v7a/build_output.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/armeabi-v7a/json_generation_record.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/armeabi-v7a/json_generation_record.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/x86/json_generation_record.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/x86/json_generation_record.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/x86_64/android_gradle_build.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/x86_64/android_gradle_build.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/x86_64/android_gradle_build_mini.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/x86_64/android_gradle_build_mini.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/x86_64/android_gradle_build_public_keys_x86_64.command.txt" beforeDir="false" afterPath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/x86_64/android_gradle_build_public_keys_x86_64.command.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/x86_64/build_command.txt" beforeDir="false" afterPath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/x86_64/build_command.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/x86_64/build_model.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/x86_64/build_model.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/x86_64/build_output.txt" beforeDir="false" afterPath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/x86_64/build_output.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/x86_64/json_generation_record.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/.cxx/ndkBuild/debug/x86_64/json_generation_record.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/google-services.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/google-services.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/proguard-rules.pro" beforeDir="false" afterPath="$PROJECT_DIR$/app/proguard-rules.pro" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/MyApplication.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/MyApplication.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/activity/DevActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/activity/DevActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/activity/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/activity/MainActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/activity/PushPopupActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/activity/PushPopupActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/broadcast/DataSaverChangeReceiver.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/broadcast/DataSaverChangeReceiver.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/broadcast/NetworkChangeReceiver.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/broadcast/NetworkChangeReceiver.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/dialog/AgentPopupDialog.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/dialog/AgentPopupDialog.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/dialog/CustomAlertDialog.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/dialog/CustomAlertDialog.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/fcm/FcmInstanceIDService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/fcm/FcmInstanceIDService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/fcm/FcmListenerService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/fcm/FcmListenerService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/fcm/PushDataNotiParser.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/fcm/PushDataNotiParser.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/fcm/PushDataPopupParser.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/fcm/PushDataPopupParser.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/fcm/PushPreferences.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/fcm/PushPreferences.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/interfaces/IDataSaverListener.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/interfaces/IDataSaverListener.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/interfaces/NetworkChangeListener.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/interfaces/NetworkChangeListener.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/interfaces/SimStateChangeListener.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/interfaces/SimStateChangeListener.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/material/MaterialRippleLayout.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/material/MaterialRippleLayout.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/notification/PushNotification.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/notification/PushNotification.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/onestore/AppConstant.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/onestore/AppConstant.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/onestore/AppSecurity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/onestore/AppSecurity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/utils/DLog.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/utils/DLog.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/utils/DeviceUtil.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/utils/DeviceUtil.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/utils/NetworkUtil.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/utils/NetworkUtil.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/utils/SharedPreferencesUtil.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/utils/SharedPreferencesUtil.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/utils/Util.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/utils/Util.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/utils/Widgetutil.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/utils/Widgetutil.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/utils/font/FontManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/utils/font/FontManager.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/utils/font/TypefaceButton.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/utils/font/TypefaceButton.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/utils/font/TypefaceRadioButton.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/utils/font/TypefaceRadioButton.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/utils/font/TypefaceTextView.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/utils/font/TypefaceTextView.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/utils/wrapper/LocaleWrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/utils/wrapper/LocaleWrapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/web/BaseWebView.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/web/BaseWebView.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/web/MyWebChromeClient.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/web/MyWebChromeClient.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/web/MyWebInterface.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/web/MyWebInterface.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/web/MyWebViewClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/web/MyWebViewClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/web/ReceivedErrorListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/web/ReceivedErrorListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/web/UrlData.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/web/UrlData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/web/constdata/IdevelServerScript.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/web/constdata/IdevelServerScript.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/web/constdata/WebConst.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/web/constdata/WebConst.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/idevel/volunteer/web/interfaces/IWebBridgeApi.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/idevel/dailyinspection/web/interfaces/IWebBridgeApi.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/jni/public_keys.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/jni/public_keys.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/dialog_type_imagetext.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/dialog_type_imagetext.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/dialog_type_text.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/dialog_type_text.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/dialog_type_web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/dialog_type_web.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/dialog_update_version.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/dialog_update_version.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/widget_popup_button.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/widget_popup_button.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/import-summary.txt" beforeDir="false" afterPath="$PROJECT_DIR$/import-summary.txt" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[/Users/jjbae/.android/avd/Nexus_10_API_22.avd]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[2b25e5d03a1c7ece]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -42,6 +133,24 @@
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="dailyInspection" type="f1a62948:ProjectNode" />
               </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="dailyInspection" type="f1a62948:ProjectNode" />
+                <item name="app" type="2d1252cf:ModuleNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="dailyInspection" type="f1a62948:ProjectNode" />
+                <item name="app" type="2d1252cf:ModuleNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="dailyInspection" type="f1a62948:ProjectNode" />
+                <item name="app" type="2d1252cf:ModuleNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="install" type="c8890929:TasksNode$1" />
+              </path>
             </expand>
             <select />
           </tree_state>
@@ -54,6 +163,9 @@
     <option name="KEY_STORE_PATH" value="$PROJECT_DIR$/keystore/bundle/volunteer_keystore" />
     <option name="KEY_ALIAS" value="jjbae" />
     <option name="REMEMBER_PASSWORDS" value="true" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitSEFilterConfiguration">
     <file-type-list>
@@ -69,7 +181,6 @@
     <ConfirmationsSetting value="2" id="Remove" />
   </component>
   <component name="ProjectViewState">
-    <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
@@ -102,7 +213,7 @@
     <property name="project.structure.side.proportion" value="0.0" />
     <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
   </component>
-  <component name="RunManager" selected="Android App.app">
+  <component name="RunManager" selected="Gradle.dm:app [installDebug]">
     <configuration default="true" type="AndroidJUnit" factoryName="Android JUnit">
       <option name="TEST_OBJECT" value="class" />
       <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
@@ -309,11 +420,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Gradle.dm:app [installDebug]" />
         <item itemvalue="Gradle.tatalk [installRelease]" />
         <item itemvalue="Gradle.tatalk [uninstallAll]" />
         <item itemvalue="Gradle.tatalk [installDebug]" />
         <item itemvalue="Gradle.dm:app [uninstallAll]" />
-        <item itemvalue="Gradle.dm:app [installDebug]" />
       </list>
     </recent_temporary>
   </component>

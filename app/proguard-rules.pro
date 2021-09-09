@@ -78,7 +78,7 @@ public static final void e(...);
 }
 
 
--keep class com.idevel.volunteer.** { *;}
+-keep class com.idevel.dailyinspection.** { *;}
 
 # one store
 -keep class com.onestore.iap.** { *;}

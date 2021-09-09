@@ -4,7 +4,7 @@
     android:id="@+id/mainview"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.idevel.volunteer.activity.MainActivity">
+    tools:context="com.idevel.dailyinspection.activity.MainActivity">
 
   <ProgressBar
       android:id="@+id/webview_progress"
@@ -22,7 +22,7 @@
       android:visibility="gone" />
 
 
-  <com.idevel.volunteer.web.BaseWebView
+  <com.idevel.dailyinspection.web.BaseWebView
       android:id="@+id/webview_main"
       android:layout_width="match_parent"
       android:layout_height="match_parent"

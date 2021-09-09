@@ -31,7 +31,7 @@
       android:background="@null"
       android:scaleType="centerCrop" />
 
-    <com.idevel.volunteer.utils.font.TypefaceTextView
+    <com.idevel.dailyinspection.utils.font.TypefaceTextView
       android:id="@+id/text_title"
       style="@style/PushPopupTitleText"
       android:layout_width="wrap_content"
@@ -39,7 +39,7 @@
       android:layout_marginTop="32dp"
       android:text="하나 빅팟카드 특가전" />
 
-    <com.idevel.volunteer.utils.font.TypefaceTextView
+    <com.idevel.dailyinspection.utils.font.TypefaceTextView
       android:id="@+id/text_body"
       style="@style/PushPopupBodyText"
       android:layout_width="wrap_content"

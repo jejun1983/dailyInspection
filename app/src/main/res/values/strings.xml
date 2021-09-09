@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">"1393자원봉사센터"</string>
+    <string name="app_name">"일상점검"</string>
     <string name="noti_channel_name_push">"푸시 알림"</string>
     <string name="toast_backkey">"뒤로 버튼을 한 번 더 누르시면 종료됩니다."</string>
     <string name="error_msg">"서비스 제공에 일시적으로 문제가 생겼습니다.\n잠시 후 다시 이용해 주세요."</string>

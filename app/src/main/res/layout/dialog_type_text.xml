@@ -22,7 +22,7 @@
       app:layout_constraintTop_toTopOf="parent">
 
     <!-- TOP -->
-    <com.idevel.volunteer.utils.font.TypefaceTextView
+    <com.idevel.dailyinspection.utils.font.TypefaceTextView
         android:id="@+id/text_title"
         style="@style/PushPopupTitleText"
         android:layout_width="wrap_content"
@@ -47,7 +47,7 @@
           android:layout_marginRight="15dp"
           android:scaleType="centerInside" />
 
-      <com.idevel.volunteer.utils.font.TypefaceTextView
+      <com.idevel.dailyinspection.utils.font.TypefaceTextView
           android:id="@+id/text_body"
           style="@style/PushPopupBodyText"
           android:layout_width="match_parent"

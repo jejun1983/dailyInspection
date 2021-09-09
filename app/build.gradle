@@ -11,7 +11,7 @@ android {
     compileSdkVersion 30
     buildToolsVersion '29.0.3'
     defaultConfig {
-        applicationId "com.idevel.volunteer"
+        applicationId "com.idevel.dailyinspection"
         minSdkVersion 19
         targetSdkVersion 30
 
@@ -63,7 +63,7 @@ android {
         variant.outputs.each { output ->
             def df = new SimpleDateFormat("yyMMdd")
             df.setTimeZone(TimeZone.getDefault())
-            def newName = "idevel_volunteer${defaultConfig.versionName}_${buildType.name}_${df.format(new Date())}.apk"
+            def newName = "idevel_dailyinspection${defaultConfig.versionName}_${buildType.name}_${df.format(new Date())}.apk"
             output.outputFileName = new File("./", newName)
         }
     }

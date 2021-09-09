@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.idevel.volunteer">
+    package="com.idevel.dailyinspection">
 
   <application
-      android:name="com.idevel.volunteer.MyApplication"
+      android:name="com.idevel.dailyinspection.MyApplication"
       android:allowBackup="false"
       android:hardwareAccelerated="true"
       android:icon="@mipmap/app_icon_4"
@@ -24,7 +24,7 @@
 
     <!-- ACTIVITY -->
     <activity
-        android:name="com.idevel.volunteer.activity.MainActivity"
+        android:name="com.idevel.dailyinspection.activity.MainActivity"
         android:configChanges="locale|keyboard|keyboardHidden|orientation|uiMode|screenSize|fontScale|smallestScreenSize|screenLayout"
         android:label="@string/app_name"
         android:launchMode="singleTask"
@@ -43,12 +43,12 @@
         <!-- scheme-->
         <data
             android:host="show-app"
-            android:scheme="idevel-volunteer" />
+            android:scheme="idevel-dailyinspection" />
       </intent-filter>
     </activity>
 
     <activity
-        android:name="com.idevel.volunteer.activity.PushPopupActivity"
+        android:name="com.idevel.dailyinspection.activity.PushPopupActivity"
         android:excludeFromRecents="true"
         android:screenOrientation="unspecified"
         android:taskAffinity="com.medialog.umobi.pushPopup"
@@ -56,7 +56,7 @@
 
     <!--DEV-->
     <activity
-        android:name="com.idevel.volunteer.activity.DevActivity"
+        android:name="com.idevel.dailyinspection.activity.DevActivity"
         android:theme="@style/Base.Theme.AppCompat" />
 
     <!-- RECEIVER -->
@@ -67,13 +67,13 @@
 
     <!-- DataSaver change receiver -->
     <receiver
-        android:name="com.idevel.volunteer.broadcast.DataSaverChangeReceiver"
+        android:name="com.idevel.dailyinspection.broadcast.DataSaverChangeReceiver"
         android:enabled="true"
         android:exported="false"
         android:label="DataSaverChange"></receiver>
 
     <!-- Network Change receiver -->
-    <receiver android:name="com.idevel.volunteer.broadcast.NetworkChangeReceiver">
+    <receiver android:name="com.idevel.dailyinspection.broadcast.NetworkChangeReceiver">
       <intent-filter>
         <action android:name="android.net.conn.BACKGROUND_DATA_SETTING_CHANGED" />
       </intent-filter>
@@ -81,7 +81,7 @@
 
     <!-- SERVICE -->
     <service
-        android:name="com.idevel.volunteer.fcm.FcmInstanceIDService"
+        android:name="com.idevel.dailyinspection.fcm.FcmInstanceIDService"
         android:enabled="true"
         android:exported="true">
       <intent-filter>
@@ -90,7 +90,7 @@
     </service>
 
     <service
-        android:name="com.idevel.volunteer.fcm.FcmListenerService"
+        android:name="com.idevel.dailyinspection.fcm.FcmListenerService"
         android:exported="false">
       <intent-filter>
         <action android:name="com.google.firebase.MESSAGING_EVENT" />

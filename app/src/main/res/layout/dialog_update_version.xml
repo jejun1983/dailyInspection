@@ -18,7 +18,7 @@
     android:paddingTop="36dp"
     android:paddingBottom="32dp">
 
-    <com.idevel.volunteer.utils.font.TypefaceTextView
+    <com.idevel.dailyinspection.utils.font.TypefaceTextView
       android:id="@+id/text_update_popup_1"
       style="@style/PushPopupTitleText"
       android:layout_width="wrap_content"
@@ -26,7 +26,7 @@
       android:layout_marginBottom="24sp"
       android:text="@string/popup_title_other_version" />
 
-    <com.idevel.volunteer.utils.font.TypefaceTextView
+    <com.idevel.dailyinspection.utils.font.TypefaceTextView
       android:id="@+id/text_update_popup_2"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
       android:textColor="@color/main_text"
       android:textSize="16sp" />
 
-    <com.idevel.volunteer.utils.font.TypefaceTextView
+    <com.idevel.dailyinspection.utils.font.TypefaceTextView
       android:id="@+id/text_update_popup_3"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
@@ -56,7 +56,7 @@
     android:layout_below="@id/layout_content"
     android:orientation="horizontal">
 
-    <com.idevel.volunteer.utils.font.TypefaceButton
+    <com.idevel.dailyinspection.utils.font.TypefaceButton
       android:id="@+id/btn_cancel"
       style="@style/PushPopupButtonLeft"
       android:layout_width="0dp"
@@ -69,7 +69,7 @@
         android:layout_height="match_parent"
         android:background="#f5f5f5" />
 
-    <com.idevel.volunteer.utils.font.TypefaceButton
+    <com.idevel.dailyinspection.utils.font.TypefaceButton
       android:id="@+id/btn_ok"
       style="@style/PushPopupButtonRight"
       android:layout_width="0dp"
@@ -78,7 +78,7 @@
       android:text="@string/popup_btn_now" />
   </LinearLayout>
 
-  <com.idevel.volunteer.utils.font.TypefaceButton
+  <com.idevel.dailyinspection.utils.font.TypefaceButton
     android:id="@+id/btn_error"
     style="@style/PopupButton"
     android:layout_width="match_parent"
