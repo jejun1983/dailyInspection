@@ -529,21 +529,24 @@ class MainActivity : FragmentActivity()
 //        }
 
         //TODO camera & gallery
-        camera_test_btn = findViewById(R.id.camera_test_btn)
+        camera_test_btn = findViewById(R.id.camera_test_btn) // QR
         camera_test_btn?.setOnClickListener {
-            doTakePhotoAction("profile", "")
+//            doTakePhotoAction("profile", "")
+
+            val intent = Intent(this@MainActivity, QrcodeScanActivity::class.java)
+            startActivityForResult(intent, REQUEST_QRSCAN_ACTIVITY)
         }
-        gallery_test_btn = findViewById(R.id.gallery_test_btn)
+        gallery_test_btn = findViewById(R.id.gallery_test_btn) // NFC
         gallery_test_btn?.setOnClickListener {
-            doTakeAlbumAction("profile", "")
+//            doTakeAlbumAction("profile", "")
         }
 
         if (BuildConfig.DEBUG) {
 //            billing_subscribe_test_btn?.visibility = View.VISIBLE
 //            billing_single_test_btn?.visibility = View.VISIBLE
 //
-//            camera_test_btn?.visibility = View.VISIBLE
-//            gallery_test_btn?.visibility = View.VISIBLE
+            camera_test_btn?.visibility = View.VISIBLE
+            gallery_test_btn?.visibility = View.VISIBLE
         }
     }
 
@@ -943,6 +946,10 @@ class MainActivity : FragmentActivity()
 //            ONESTORE_LOGIN_REQUEST_CODE -> {
 //                // TODO onestore 로그인 이후
 //            }
+
+            REQUEST_QRSCAN_ACTIVITY -> { //QR
+                //TODO
+            }
         }
     }
 
@@ -1192,6 +1199,7 @@ class MainActivity : FragmentActivity()
         private val TEL_REQUEST_CODE = 997
         private val PICK_FROM_ALBUM = 996
         private val PICK_FROM_CAMERA = 995
+        private val REQUEST_QRSCAN_ACTIVITY = 994
 
 
         private val PING_TIME = 100000 //The ping time.

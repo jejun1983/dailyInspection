@@ -59,7 +59,7 @@
       android:layout_alignParentBottom="true"
       android:layout_marginRight="30dp"
       android:layout_marginBottom="150dp"
-      android:text="카메라"
+      android:text="QR"
       android:visibility="gone" />
 
   <Button
@@ -70,7 +70,7 @@
       android:layout_marginRight="30dp"
       android:layout_marginBottom="150dp"
       android:layout_toLeftOf="@id/camera_test_btn"
-      android:text="갤러리"
+      android:text="NFC"
       android:visibility="gone" />
 
 

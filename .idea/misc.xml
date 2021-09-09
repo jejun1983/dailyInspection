@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.13145896656534956" />
+        <entry key="app/src/main/res/layout/activity_qrcode_scan.xml" value="0.13145896656534956" />
         <entry key="app/src/main/res/layout/view_splash.xml" value="0.13145896656534956" />
       </map>
     </option>
