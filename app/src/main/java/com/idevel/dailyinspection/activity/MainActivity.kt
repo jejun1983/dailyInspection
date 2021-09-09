@@ -1,7 +1,7 @@
 package com.idevel.dailyinspection.activity
 
 
-import ApiManager
+import kr.co.medialog.ApiManager
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -74,6 +74,13 @@ import java.net.URISyntaxException
 import java.net.URL
 import java.util.*
 import kotlin.system.exitProcess
+
+import android.nfc.NdefMessage
+
+import kotlin.experimental.and
+import android.nfc.NfcAdapter
+
+import android.app.PendingIntent
 
 
 /**
@@ -213,6 +220,9 @@ class MainActivity : FragmentActivity()
         }
     }
 
+    private var nfcAdapter: NfcAdapter? = null
+    private var pendingIntent: PendingIntent? = null
+    private var writeTagFilters: Array<IntentFilter>? = null
     override fun onResume() {
         super.onResume()
 
@@ -224,6 +234,24 @@ class MainActivity : FragmentActivity()
 
         mWebview?.sendEvent(IdevelServerScript.SET_APP_STATUS, AppStatusInfo("onResume").toJsonString())
         mWebview?.onResume()
+
+
+        // NFC
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this)
+        if (nfcAdapter == null) {
+            // Stop here, we definitely need NFC
+            Toast.makeText(this, "This device doesn't support NFC.", Toast.LENGTH_LONG).show()
+            finish()
+        } else {
+            DLog.e("bjj onResume nfcAdapter !!")
+        }
+
+        readFromIntent(intent)
+
+        pendingIntent = PendingIntent.getActivity(this, 0, Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0)
+        val tagDetected = IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED)
+        tagDetected.addCategory(Intent.CATEGORY_DEFAULT)
+        writeTagFilters = arrayOf(tagDetected)
     }
 
     override fun onPause() {
@@ -948,7 +976,12 @@ class MainActivity : FragmentActivity()
 //            }
 
             REQUEST_QRSCAN_ACTIVITY -> { //QR
-                //TODO
+                if (resultCode == Activity.RESULT_OK) {
+                    val qrResult = intent?.getStringExtra(QrcodeScanActivity.CALL_BACK)
+
+                    DLog.e("bjj REQUEST_QRSCAN_ACTIVITY :: " + qrResult)
+                    //TODO web 으로 data 전달
+                }
             }
         }
     }
@@ -2400,5 +2433,60 @@ class MainActivity : FragmentActivity()
         }
 
         mWebview?.sendEvent(IdevelServerScript.SET_DOWNLOAD_FILE, DownloadFileStatusInfo(isSuccess).toJsonString())
+    }
+
+//    fun setReadTagDataa(ndefmsg: NdefMessage?) {
+//        if (ndefmsg == null) {
+//            return
+//        }
+//        var msgs = ""
+//        msgs += ndefmsg + "\n"
+//        val records = ndefmsg.records
+//        for (rec in records) {
+//            val payload = rec.payload
+//            var textEncoding = "UTF-8"
+//            if (payload.size > 0) {
+////                textEncoding = (payload[0] & 0200) == 0 ? "UTF-8" : "UTF-16";
+//            }
+//            val tnf = rec.tnf
+//            val type = String(rec.type)
+//            val payloadStr = String(rec.payload, Charset.forName(textEncoding))
+//        }
+//    }
+
+
+    /******************************************************************************
+     * Read From NFC Tag***************************
+     */
+    private fun readFromIntent(intent: Intent) {
+        val action = intent.action
+        if (NfcAdapter.ACTION_TAG_DISCOVERED == action || NfcAdapter.ACTION_TECH_DISCOVERED == action || NfcAdapter.ACTION_NDEF_DISCOVERED == action) {
+            val rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
+            var msgs: Array<NdefMessage?>? = null
+            if (rawMsgs != null) {
+                msgs = arrayOfNulls(rawMsgs.size)
+                for (i in rawMsgs.indices) {
+                    msgs[i] = rawMsgs[i] as NdefMessage
+                }
+            }
+            buildTagViews(msgs)
+        }
+    }
+
+    private fun buildTagViews(msgs: Array<NdefMessage?>?) {
+//        if (msgs == null || msgs.size == 0) return
+//        var text = ""
+//        //        String tagId = new String(msgs[0].getRecords()[0].getType());
+//        val payload = msgs[0]!!.records[0].payload
+//        val textEncoding = if (payload[0] and 128 == 0) "UTF-8" else "UTF-16" // Get the Text Encoding
+//        val languageCodeLength = (payload[0] and 51).toInt() // Get the Language Code, e.g. "en"
+//        // String languageCode = new String(payload, 1, languageCodeLength, "US-ASCII");
+//        try {
+//            // Get the Text
+//            text = String(payload, languageCodeLength + 1, payload.size - languageCodeLength - 1, textEncoding)
+//        } catch (e: UnsupportedEncodingException) {
+//            DLog.e("UnsupportedEncoding", e.toString())
+//        }
+//        tvNFCContent.setText("NFC Content: $text")
     }
 }

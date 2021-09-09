@@ -21,6 +21,7 @@ class QrcodeScanActivity : AppCompatActivity() {
     companion object {
         const val IS_MANUAL = "IS_MANUAL"
         const val WEB_URL = "WEB_URL"
+        const val CALL_BACK = "CALL_BACK"
     }
 
     private var myWebview: WebView? = null
@@ -59,11 +60,22 @@ class QrcodeScanActivity : AppCompatActivity() {
         if (result.contents == null) {
             Toast.makeText(this@QrcodeScanActivity, "QR코드 인증이 취소되었습니다.", Toast.LENGTH_SHORT).show()
 
+            isRegistSucess = false
+
+            setResult(RESULT_CANCELED)
             finish()
         } else {
             DLog.i("bjj QrcodeScanActivity onActivityResult aa ::" + result.contents)
 
             Toast.makeText(this, "페이지를 가져오는데 성공하였습니다.", Toast.LENGTH_SHORT).show()
+
+            isRegistSucess = true
+
+            val i = Intent()
+            i.putExtra(CALL_BACK, result.contents)
+
+            setResult(RESULT_OK, i)
+            finish()
         }
     }
 
