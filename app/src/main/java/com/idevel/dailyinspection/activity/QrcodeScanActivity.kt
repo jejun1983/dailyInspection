@@ -19,6 +19,7 @@ import java.util.*
 
 class QrcodeScanActivity : AppCompatActivity() {
     companion object {
+        const val IS_FLASH = "IS_FLASH"
         const val IS_MANUAL = "IS_MANUAL"
         const val WEB_URL = "WEB_URL"
         const val CALL_BACK = "CALL_BACK"
@@ -145,6 +146,11 @@ class QrcodeScanActivity : AppCompatActivity() {
         integrator.setOrientationLocked(false)
         integrator.captureActivity = QrcodeCaptureActivity::class.java
         integrator.setPrompt("QR코드를 사각형 안에 비춰주세요.")
+
+        val isFlash = intent.getBooleanExtra(IS_FLASH, false)
+        if (isFlash) {
+            integrator.setTorchEnabled(true)
+        }
 
         integrator.initiateScan()
     }

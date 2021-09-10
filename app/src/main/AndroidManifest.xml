@@ -36,6 +36,19 @@
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
 
+
+      <!--NFC s-->
+      <intent-filter>
+        <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <data android:mimeType="text/plain" />
+      </intent-filter>
+
+      <meta-data
+          android:name="android.nfc.action.TECH_DISCOVERED"
+          android:resource="@xml/nfc_tech_filter" />
+      <!--NFC e-->
+
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
 
@@ -47,16 +60,6 @@
             android:host="show-app"
             android:scheme="idevel-dailyinspection" />
       </intent-filter>
-
-      <intent-filter>
-        <action android:name="android.nfc.action.NDEF_DISCOVERED" />
-        <category android:name="android.intent.category.DEFAULT" />
-        <data android:mimeType="text/plain" />
-      </intent-filter>
-      <meta-data
-          android:name="android.nfc.action.TECH_DISCOVERED"
-          android:resource="@xml/nfc_tech_filter" />
-
     </activity>
 
     <activity
@@ -123,10 +126,10 @@
     <activity
         android:name="com.idevel.dailyinspection.activity.QrcodeScanActivity"
         android:exported="true"
+        android:hardwareAccelerated="true"
         android:screenOrientation="fullSensor"
         android:stateNotNeeded="true"
         android:windowSoftInputMode="stateAlwaysHidden"
-        android:hardwareAccelerated="true"
         tools:replace="screenOrientation" />
 
     <activity
@@ -174,7 +177,9 @@
   <!--  <uses-permission android:name="com.android.vending.BILLING" />-->
 
   <uses-permission android:name="android.permission.NFC" />
-  <uses-feature android:name="android.hardware.nfc" android:required="true" />
+  <uses-feature
+      android:name="android.hardware.nfc"
+      android:required="true" />
 
 
 </manifest>

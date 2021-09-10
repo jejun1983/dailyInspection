@@ -1,10 +1,10 @@
 package com.idevel.dailyinspection.activity
 
 
-import kr.co.medialog.ApiManager
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.PendingIntent
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
@@ -19,6 +19,8 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.Uri
+import android.nfc.NfcAdapter
+import android.nfc.NfcManager
 import android.os.*
 import android.provider.MediaStore
 import android.provider.Settings
@@ -64,23 +66,16 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.onestore.iap.api.*
 import com.onestore.iap.api.PurchaseClient.*
+import kr.co.medialog.ApiManager
 import kr.co.medialog.SettingInfoData
 import kr.co.medialog.UploadInfoData
 import okhttp3.ResponseBody
 import java.io.*
-import java.lang.StringBuilder
 import java.lang.ref.WeakReference
 import java.net.URISyntaxException
 import java.net.URL
 import java.util.*
 import kotlin.system.exitProcess
-
-import android.nfc.NdefMessage
-
-import kotlin.experimental.and
-import android.nfc.NfcAdapter
-
-import android.app.PendingIntent
 
 
 /**
@@ -127,6 +122,10 @@ class MainActivity : FragmentActivity()
 //        get() = Action.Builder(Action.Builder.VIEW_ACTION)
 //                .setObject("Main Page", "android-app://com.idevel.dailyinspection/http/host/path", "http://host/path")
 //                .build()
+
+
+    private var nfcAdapter: NfcAdapter? = null
+    private var isQrFlash: Boolean = false
 
 
     override fun attachBaseContext(newBase: Context?) {
@@ -188,6 +187,15 @@ class MainActivity : FragmentActivity()
 //            // 앱 설정
         checkSettingInfo()
 //        }
+
+
+        //Initialise NfcAdapter
+        val nfcManager = getSystemService(Context.NFC_SERVICE) as NfcManager
+        nfcAdapter = nfcManager.defaultAdapter
+
+        if (nfcAdapter == null) {
+            Toast.makeText(this, "NO NFC Capabilities", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun goToDevActivity() {
@@ -200,7 +208,7 @@ class MainActivity : FragmentActivity()
         super.onNewIntent(intent)
 
         val isNoti = intent.getIntExtra(IS_NOTI, -1)
-        DLog.e("bjj onNewIntent :: " + isNoti + " ^ " + mWebview)
+        DLog.e("bjj onNewIntent :: " + isNoti + " ^ " + intent.getAction())
 
         if (isNoti == 1) {
             checkPushData(intent)
@@ -217,12 +225,16 @@ class MainActivity : FragmentActivity()
                     }
                 }
             }
+        } else {
+            // NFC
+            if (NfcAdapter.ACTION_TAG_DISCOVERED == intent.getAction() ||
+                    NfcAdapter.ACTION_TECH_DISCOVERED == intent.getAction() ||
+                    NfcAdapter.ACTION_NDEF_DISCOVERED == intent.getAction()) {
+                showNFC(intent)
+            }
         }
     }
 
-    private var nfcAdapter: NfcAdapter? = null
-    private var pendingIntent: PendingIntent? = null
-    private var writeTagFilters: Array<IntentFilter>? = null
     override fun onResume() {
         super.onResume()
 
@@ -235,23 +247,14 @@ class MainActivity : FragmentActivity()
         mWebview?.sendEvent(IdevelServerScript.SET_APP_STATUS, AppStatusInfo("onResume").toJsonString())
         mWebview?.onResume()
 
+        try {
+            val intent = Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            val nfcPendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
 
-        // NFC
-        nfcAdapter = NfcAdapter.getDefaultAdapter(this)
-        if (nfcAdapter == null) {
-            // Stop here, we definitely need NFC
-            Toast.makeText(this, "This device doesn't support NFC.", Toast.LENGTH_LONG).show()
-            finish()
-        } else {
-            DLog.e("bjj onResume nfcAdapter !!")
+            nfcAdapter?.enableForegroundDispatch(this, nfcPendingIntent, null, null)
+        } catch (ex: IllegalStateException) {
+            DLog.e("bjj Error enabling NFC foreground dispatch" + ex)
         }
-
-        readFromIntent(intent)
-
-        pendingIntent = PendingIntent.getActivity(this, 0, Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0)
-        val tagDetected = IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED)
-        tagDetected.addCategory(Intent.CATEGORY_DEFAULT)
-        writeTagFilters = arrayOf(tagDetected)
     }
 
     override fun onPause() {
@@ -265,6 +268,14 @@ class MainActivity : FragmentActivity()
 
         mWebview?.sendEvent(IdevelServerScript.SET_APP_STATUS, AppStatusInfo("onPause").toJsonString())
         mWebview?.onPause()
+
+        nfcAdapter?.disableForegroundDispatch(this)
+
+        try {
+            nfcAdapter?.disableForegroundDispatch(this)
+        } catch (ex: IllegalStateException) {
+            DLog.e("bjj Error disabling NFC foreground dispatch" + ex)
+        }
     }
 
     private fun checkSettingInfo() {
@@ -504,7 +515,7 @@ class MainActivity : FragmentActivity()
         mErrorView?.visibility = View.GONE
 
         val isNoti = intent.getIntExtra(IS_NOTI, -1)
-        DLog.e("bjj onNewIntent :: showMainView " + isNotiLandingFinissh + " ^ " + isNoti + " ^ " + mWebview)
+        DLog.e("bjj showMainView " + isNotiLandingFinissh + " ^ " + isNoti + " ^ " + mWebview)
 
         if (!isNotiLandingFinissh && isNoti == 0) {
             val linkType = intent.getStringExtra(PUSH_DATA_LINK_TYPE)
@@ -562,6 +573,8 @@ class MainActivity : FragmentActivity()
 //            doTakePhotoAction("profile", "")
 
             val intent = Intent(this@MainActivity, QrcodeScanActivity::class.java)
+            intent.putExtra(QrcodeScanActivity.IS_FLASH, isQrFlash)
+
             startActivityForResult(intent, REQUEST_QRSCAN_ACTIVITY)
         }
         gallery_test_btn = findViewById(R.id.gallery_test_btn) // NFC
@@ -2435,58 +2448,14 @@ class MainActivity : FragmentActivity()
         mWebview?.sendEvent(IdevelServerScript.SET_DOWNLOAD_FILE, DownloadFileStatusInfo(isSuccess).toJsonString())
     }
 
-//    fun setReadTagDataa(ndefmsg: NdefMessage?) {
-//        if (ndefmsg == null) {
-//            return
-//        }
-//        var msgs = ""
-//        msgs += ndefmsg + "\n"
-//        val records = ndefmsg.records
-//        for (rec in records) {
-//            val payload = rec.payload
-//            var textEncoding = "UTF-8"
-//            if (payload.size > 0) {
-////                textEncoding = (payload[0] & 0200) == 0 ? "UTF-8" : "UTF-16";
-//            }
-//            val tnf = rec.tnf
-//            val type = String(rec.type)
-//            val payloadStr = String(rec.payload, Charset.forName(textEncoding))
-//        }
-//    }
-
 
     /******************************************************************************
      * Read From NFC Tag***************************
      */
-    private fun readFromIntent(intent: Intent) {
-        val action = intent.action
-        if (NfcAdapter.ACTION_TAG_DISCOVERED == action || NfcAdapter.ACTION_TECH_DISCOVERED == action || NfcAdapter.ACTION_NDEF_DISCOVERED == action) {
-            val rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
-            var msgs: Array<NdefMessage?>? = null
-            if (rawMsgs != null) {
-                msgs = arrayOfNulls(rawMsgs.size)
-                for (i in rawMsgs.indices) {
-                    msgs[i] = rawMsgs[i] as NdefMessage
-                }
-            }
-            buildTagViews(msgs)
-        }
-    }
+    private fun showNFC(intent: Intent) { //테그데이터를 전달받았을때 태그정보를 화면에 보여줌.
+//        val tag: Tag? = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
+//        val tag2 = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
 
-    private fun buildTagViews(msgs: Array<NdefMessage?>?) {
-//        if (msgs == null || msgs.size == 0) return
-//        var text = ""
-//        //        String tagId = new String(msgs[0].getRecords()[0].getType());
-//        val payload = msgs[0]!!.records[0].payload
-//        val textEncoding = if (payload[0] and 128 == 0) "UTF-8" else "UTF-16" // Get the Text Encoding
-//        val languageCodeLength = (payload[0] and 51).toInt() // Get the Language Code, e.g. "en"
-//        // String languageCode = new String(payload, 1, languageCodeLength, "US-ASCII");
-//        try {
-//            // Get the Text
-//            text = String(payload, languageCodeLength + 1, payload.size - languageCodeLength - 1, textEncoding)
-//        } catch (e: UnsupportedEncodingException) {
-//            DLog.e("UnsupportedEncoding", e.toString())
-//        }
-//        tvNFCContent.setText("NFC Content: $text")
+        val nfcStr: String = NfcUtils.resolveIntent(intent)
     }
 }
