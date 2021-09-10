@@ -37,4 +37,8 @@ interface IWebBridgeApi {
     fun getAccount()
 
     fun downloadFile(fileURL: String, fileName: String)
+
+    fun setQrFlash(isBool: Boolean)
+    fun openQR()
+    fun startNFC(isBool: Boolean)
 }

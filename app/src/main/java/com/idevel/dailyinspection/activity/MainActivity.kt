@@ -126,6 +126,7 @@ class MainActivity : FragmentActivity()
 
     private var nfcAdapter: NfcAdapter? = null
     private var isQrFlash: Boolean = false
+    private var isNFCenable: Boolean = false
 
 
     override fun attachBaseContext(newBase: Context?) {
@@ -580,6 +581,8 @@ class MainActivity : FragmentActivity()
         gallery_test_btn = findViewById(R.id.gallery_test_btn) // NFC
         gallery_test_btn?.setOnClickListener {
 //            doTakeAlbumAction("profile", "")
+
+            isNFCenable = true
         }
 
         if (BuildConfig.DEBUG) {
@@ -993,7 +996,14 @@ class MainActivity : FragmentActivity()
                     val qrResult = intent?.getStringExtra(QrcodeScanActivity.CALL_BACK)
 
                     DLog.e("bjj REQUEST_QRSCAN_ACTIVITY :: " + qrResult)
-                    //TODO web 으로 data 전달
+
+                    if (qrResult.isNullOrEmpty()) {
+                        mWebview?.sendEvent(IdevelServerScript.OPEN_QR, QrInfo("").toJsonString())
+                    } else {
+                        mWebview?.sendEvent(IdevelServerScript.OPEN_QR, QrInfo(qrResult).toJsonString())
+                    }
+                } else {
+                    mWebview?.sendEvent(IdevelServerScript.OPEN_QR, QrInfo("").toJsonString())
                 }
             }
         }
@@ -1230,6 +1240,31 @@ class MainActivity : FragmentActivity()
         override fun downloadFile(fileURL: String, fileName: String) {
             (this@MainActivity as Activity).runOnUiThread {
                 testRecordDownload(fileURL, fileName)
+            }
+        }
+
+        override fun setQrFlash(isBool: Boolean) {
+            (this@MainActivity as Activity).runOnUiThread {
+                isQrFlash = isBool
+            }
+        }
+
+        override fun openQR() {
+            (this@MainActivity as Activity).runOnUiThread {
+                val intent = Intent(this@MainActivity, QrcodeScanActivity::class.java)
+                intent.putExtra(QrcodeScanActivity.IS_FLASH, isQrFlash)
+
+                startActivityForResult(intent, REQUEST_QRSCAN_ACTIVITY)
+            }
+        }
+
+        override fun startNFC(isBool: Boolean) {
+            (this@MainActivity as Activity).runOnUiThread {
+                if (isBool) {
+                    Toast.makeText(this@MainActivity, "NFC 인식이 활성화되었습니다.", Toast.LENGTH_SHORT).show()
+                }
+
+                isNFCenable = isBool
             }
         }
     }
@@ -2456,6 +2491,14 @@ class MainActivity : FragmentActivity()
 //        val tag: Tag? = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
 //        val tag2 = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
 
-        val nfcStr: String = NfcUtils.resolveIntent(intent)
+        if (isNFCenable) {
+            val nfcStr: String = NfcUtils.resolveIntent(intent)
+
+            if (nfcStr.isEmpty()) {
+                mWebview?.sendEvent(IdevelServerScript.SET_NFC, NfcInfo("").toJsonString())
+            } else {
+                mWebview?.sendEvent(IdevelServerScript.SET_NFC, NfcInfo(nfcStr).toJsonString())
+            }
+        }
     }
 }

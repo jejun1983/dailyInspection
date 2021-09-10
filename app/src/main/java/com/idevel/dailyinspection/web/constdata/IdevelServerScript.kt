@@ -20,5 +20,8 @@ enum class IdevelServerScript(val scriptName: String) {
     GET_AUTO_LOGIN("getAutoLogin"),
     GET_ACCOUNT("getAccount"),
 
-    SET_DOWNLOAD_FILE("downloadFile")
+    SET_DOWNLOAD_FILE("downloadFile"),
+
+    SET_NFC("setNFC"),
+    OPEN_QR("openQR")
 }

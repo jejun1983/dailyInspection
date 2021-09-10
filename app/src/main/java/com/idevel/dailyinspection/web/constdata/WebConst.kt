@@ -132,6 +132,22 @@ data class AccountInfo(
     }
 }
 
+data class QrInfo(
+        @SerializedName("result") val result: String
+) {
+    fun toJsonString(): String {
+        return gson().toJson(this)
+    }
+}
+
+data class NfcInfo(
+        @SerializedName("result") val result: String
+) {
+    fun toJsonString(): String {
+        return gson().toJson(this)
+    }
+}
+
 private fun gson(): Gson {
     return GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create()
 }

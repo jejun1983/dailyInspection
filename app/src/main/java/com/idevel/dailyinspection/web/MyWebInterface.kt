@@ -155,4 +155,22 @@ class MyWebInterface(private val mContext: Context, private val api: IWebBridgeA
         DLog.e("bjj data: downloadFile " + fileURL + " ^ " + fileName)
         api.downloadFile(fileURL, fileName)
     }
+
+    @JavascriptInterface
+    fun setQrFlash(isBool: Boolean) {
+        DLog.e("bjj data: setQrFlash " + isBool)
+        api.setQrFlash(isBool)
+    }
+
+    @JavascriptInterface
+    fun openQR() {
+        DLog.e("bjj data: openQR ")
+        api.openQR()
+    }
+
+    @JavascriptInterface
+    fun startNFC(isBool: Boolean) {
+        DLog.e("bjj data: startNFC " + isBool)
+        api.startNFC(isBool)
+    }
 }
