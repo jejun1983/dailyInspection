@@ -4,19 +4,24 @@ package com.idevel.dailyinspection.activity
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.ClipData
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.le.*
+import android.content.*
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.media.SoundPool
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.nfc.NfcAdapter
@@ -52,6 +57,8 @@ import com.idevel.dailyinspection.fcm.PushPreferences.PUSH_DATA_SHOWTIME
 import com.idevel.dailyinspection.interfaces.IDataSaverListener
 import com.idevel.dailyinspection.interfaces.NetworkChangeListener
 import com.idevel.dailyinspection.utils.*
+import com.idevel.dailyinspection.utils.ble.Beacon
+import com.idevel.dailyinspection.utils.ble.Gps
 import com.idevel.dailyinspection.utils.wrapper.LocaleWrapper
 import com.idevel.dailyinspection.web.BaseWebView
 import com.idevel.dailyinspection.web.MyWebChromeClient
@@ -64,6 +71,14 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import com.limei.indoorcommon.consts.LMEnum
+import com.limei.indoorcommon.consts.LMEnum.InitState
+import com.limei.indoorcommon.model.beaconMgr.LMBeacon
+import com.limei.indoorcommon.model.configMgr.LMConfig
+import com.limei.positioningengine.ICheckInListener
+import com.limei.positioningengine.IPositioningEngineStub
+import com.limei.positioningengine.IPositioningInfoListener
+import com.limei.positioningengine.PositioningEngine
 import com.onestore.iap.api.*
 import com.onestore.iap.api.PurchaseClient.*
 import kr.co.medialog.ApiManager
@@ -74,6 +89,7 @@ import java.io.*
 import java.lang.ref.WeakReference
 import java.net.URISyntaxException
 import java.net.URL
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.system.exitProcess
 
@@ -83,7 +99,7 @@ import kotlin.system.exitProcess
  *
  * @author : jjbae
  */
-class MainActivity : FragmentActivity()
+class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListener, SensorEventListener
 //        , BillingProcessor.IBillingHandler
 {
     private var mAgentPopupDialog: AgentPopupDialog? = null
@@ -190,7 +206,7 @@ class MainActivity : FragmentActivity()
 //        }
 
 
-        //Initialise NfcAdapter
+        //Initialise NFC
         val nfcManager = getSystemService(Context.NFC_SERVICE) as NfcManager
         nfcAdapter = nfcManager.defaultAdapter
 
@@ -256,6 +272,9 @@ class MainActivity : FragmentActivity()
         } catch (ex: IllegalStateException) {
             DLog.e("bjj Error enabling NFC foreground dispatch" + ex)
         }
+
+        // beacon
+        initLocationManager()
     }
 
     override fun onPause() {
@@ -276,6 +295,10 @@ class MainActivity : FragmentActivity()
             nfcAdapter?.disableForegroundDispatch(this)
         } catch (ex: IllegalStateException) {
             DLog.e("bjj Error disabling NFC foreground dispatch" + ex)
+        }
+
+        if (locationManager != null) {
+            locationManager!!.removeUpdates(locationListener)
         }
     }
 
@@ -375,6 +398,9 @@ class MainActivity : FragmentActivity()
      * Sets the main view.
      */
     private fun setMainView() {
+        //Initialise Beacon
+        initBeacon()
+
         if (mWebview == null) {
             return
         }
@@ -400,7 +426,7 @@ class MainActivity : FragmentActivity()
             override fun onPageFinished(view: WebView, url: String) {
                 super.onPageFinished(view, url)
 
-                if (url == "https://www.1393kfsp.or.kr/login.php") {
+                if (url == "https://lgdc.wtest.biz/login/checkForm.php") {
                     removeSplash()
                 }
 
@@ -589,8 +615,8 @@ class MainActivity : FragmentActivity()
 //            billing_subscribe_test_btn?.visibility = View.VISIBLE
 //            billing_single_test_btn?.visibility = View.VISIBLE
 //
-            camera_test_btn?.visibility = View.VISIBLE
-            gallery_test_btn?.visibility = View.VISIBLE
+//            camera_test_btn?.visibility = View.VISIBLE
+//            gallery_test_btn?.visibility = View.VISIBLE
         }
     }
 
@@ -839,6 +865,32 @@ class MainActivity : FragmentActivity()
 //            }
 //        }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (mBluetoothLeScanner != null) {
+                mBluetoothLeScanner!!.stopScan(mScanCallback)
+            }
+        }
+
+        bleTimer?.cancel()
+
+        if (mGps != null) {
+            mGps!!.finishGps()
+        }
+
+        if (m_positioningEngine != null) {
+            m_positioningEngine!!.removeCheckInListener(this)
+            m_positioningEngine!!.removeInfoListener(this)
+            m_positioningEngine!!.stop()
+            m_positioningEngine!!.quit()
+        }
+
+//        if (textToSpeech != null) {
+//            textToSpeech.stop()
+//            textToSpeech.shutdown()
+//        }
+
+//        mTimer?.cancel()
+
         super.onDestroy()
 
         // 앱 종료시 PurchaseClient를 이용하여 서비스를 terminate 시킵니다.
@@ -947,11 +999,14 @@ class MainActivity : FragmentActivity()
 
             PICK_FROM_CAMERA -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    if (intent?.extras?.get("data") != null) {
-                        if (intent?.extras?.get("data") is Bitmap) {
-                            sendCameraImage(intent?.extras?.get("data") as Bitmap)
-                        }
-                    }
+//                    if (intent?.extras?.get("data") != null) {
+//                        if (intent?.extras?.get("data") is Bitmap) {
+//                            sendCameraImage(intent?.extras?.get("data") as Bitmap)
+//                        }
+//                    }
+
+                    sendCameraImage(photoURI!!)
+                    photoURI = null
                 }
             }
 
@@ -2206,7 +2261,22 @@ class MainActivity : FragmentActivity()
         val intent = Intent()
         intent.action = MediaStore.ACTION_IMAGE_CAPTURE
 
-        startActivityForResult(intent, PICK_FROM_CAMERA)
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val imageFileName = "JPEG_$timeStamp.jpg"
+
+        createImageUri(imageFileName, "image/jpg")?.let { uri ->
+            photoURI = uri
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+            startActivityForResult(intent, PICK_FROM_CAMERA)
+        }
+    }
+
+    private var photoURI: Uri? = null
+    fun createImageUri(filename: String, mimeType: String): Uri? {
+        var values = ContentValues()
+        values.put(MediaStore.Images.Media.DISPLAY_NAME, filename)
+        values.put(MediaStore.Images.Media.MIME_TYPE, mimeType)
+        return contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
     }
 
     private fun sendGalleryImage(uri: Uri, index: Int = 0, totalCount: Int = 0) {
@@ -2219,10 +2289,15 @@ class MainActivity : FragmentActivity()
         }
     }
 
-    private fun sendCameraImage(bitmap: Bitmap) {
-        DLog.e("bjj camera sendCameraImage :: bitmap " + bitmap + " ^ " + getImageFile(getCaptureImageUri(bitmap)!!)?.absolutePath)
+//    private fun sendCameraImage(bitmap: Bitmap) {
+//        DLog.e("bjj camera sendCameraImage :: bitmap " + bitmap + " ^ " + getImageFile(getCaptureImageUri(bitmap)!!)?.absolutePath)
+//
+//        uploadFile(getImageFile(getCaptureImageUri(bitmap)!!)?.absolutePath)
+//    }
 
-        uploadFile(getImageFile(getCaptureImageUri(bitmap)!!)?.absolutePath)
+    private fun sendCameraImage(uri: Uri) {
+        DLog.e("bjj camera sendCameraImage :: path " + getImageFile(uri)?.absolutePath)
+        uploadFile(getImageFile(uri)?.absolutePath)
     }
 
     private fun resizeBitmapImageFn(bmpSource: Bitmap, maxResolution: Int): Bitmap? {
@@ -2344,7 +2419,7 @@ class MainActivity : FragmentActivity()
 
     @SuppressLint("StaticFieldLeak")
     private fun testRecordDownload(fileURL: String, fileName: String) {
-        val baseUrl = "https://1393kfsp.or.kr"
+        val baseUrl = "https://lgdc.wtest.biz"
 
         mApiManager?.startRecordDownload(baseUrl, fileURL, object : OnResultListener<Any> {
             override fun onResult(result: Any, flag: Int) {
@@ -2386,7 +2461,7 @@ class MainActivity : FragmentActivity()
 
 
             savedRootFilePath = "$savedRootFilePath${File.separator}Download${File.separator}"
-            var sohoDownloadFolder = File(savedRootFilePath, "${File.separator}1393")
+            val sohoDownloadFolder = File(savedRootFilePath, "${File.separator}1393")
 
             if (!sohoDownloadFolder.exists()) {
                 sohoDownloadFolder.mkdirs()
@@ -2484,8 +2559,8 @@ class MainActivity : FragmentActivity()
     }
 
 
-    /******************************************************************************
-     * Read From NFC Tag***************************
+    /**
+     * Read From NFC Tag
      */
     private fun showNFC(intent: Intent) { //테그데이터를 전달받았을때 태그정보를 화면에 보여줌.
 //        val tag: Tag? = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
@@ -2499,6 +2574,462 @@ class MainActivity : FragmentActivity()
             } else {
                 mWebview?.sendEvent(IdevelServerScript.SET_NFC, NfcInfo(nfcStr).toJsonString())
             }
+        }
+    }
+
+
+    /**
+     * Read Beacon
+     */
+    var lastLocation: Location? = null
+    var isGPS = ""
+    var mBluetoothAdapter: BluetoothAdapter? = null
+    var mBluetoothLeScanner: BluetoothLeScanner? = null
+    var mBluetoothLeAdvertiser: BluetoothLeAdvertiser? = null
+    var mScanSettings: ScanSettings.Builder? = null
+    var scanFilters: List<ScanFilter>? = null
+    var mScanCallback: ScanCallback? = null
+
+    private val notificationManager: NotificationManager? = null
+    private var beaconIntent: PendingIntent? = null
+    private var powerManager: PowerManager? = null
+    private var wakeLock: PowerManager.WakeLock? = null
+    private var vibrator: Vibrator? = null
+    private var sound_pool: SoundPool? = null
+    private var sound_beep = 0
+//    private val textToSpeech: TextToSpeech? = null
+
+    private var sensorManager: SensorManager? = null
+    private var stepCountSensor: Sensor? = null
+    private var accelerormeterSensor: Sensor? = null
+    private var lastTime: Long = 0
+    private var speed = 0f
+    private var lastX = 0f
+    private var lastY = 0f
+    private var lastZ = 0f
+    private var x = 0f
+    private var y: kotlin.Float = 0f
+    private var z: kotlin.Float = 0f
+    private val SHAKE_THRESHOLD = 50
+    private val DATA_X = SensorManager.DATA_X
+    private val DATA_Y = SensorManager.DATA_Y
+    private val DATA_Z = SensorManager.DATA_Z
+
+    var stepTime: Long = 0
+    private var bleTimer: Timer? = null
+    private var bleTimerTask: TimerTask? = null
+    private val countDownTimer: CountDownTimer? = null
+
+    var strOxygenVol = ""
+    var O2State = ""
+
+    var arBeacon: ArrayList<Beacon> = ArrayList<Beacon>()
+    var arOxy: ArrayList<Beacon> = ArrayList<Beacon>()
+    var blEmerIn = false
+    var inEmerIWERK = "" // 해당 비콘 IWERK
+    var inEmerBeacon = "" // 해당 비콘 MAC주소
+    var inEmerBeaconID = "" // 해당 비콘 ID
+    var inEmerPlaceName = "" // 해당 비콘 시설물 이름
+    var inEmerPlaceCode = "" // 해당 비콘 시설물 코드
+    var inEmerWorkTime = "" //표준작업시간
+    var inEmerTime: Long = 0 //위험구역 진입한 시간
+    var inEmerSafeTxT = "" // 시설물별 안전문구
+    var blOutStandby = false // 퇴장을 위한 타이머 구동 여부
+    var blWorkTime_Plus = true //사전알람 팝업 여부
+    var blPlayAlarm = true // 비콘정보수신실패시 비상호출기능 비활성화
+    var txtOxy = "" //산소농도 수치
+    var txtBeacon = "위험지역 :" //화면표시될 비콘
+    var emerAutoTime = "10" //비상호출 자동전송 (초)
+    var notMoveAutoTime = "10" //미움직임 자동전송 (초)
+    var notMoveTime = "1" //미움직임 감지시간 (분)
+    private val REQUEST_LOC_AGREE = 12 // 위치동의
+    private val REQUEST_EMER_CALL = 13 // 비상호출
+    private val REQUEST_NOT_MOVE = 14 // 미움직임
+    private val REQUEST_WORKTIME_PLUS = 15 // 표준작업시간경과 사전알람
+
+
+    val PROJECT_ID = "PRJ000001"
+    private val REQUEST_PERMISSION_ACCESS_FINE_LOCATION = 1
+    private var m_positioningEngine: IPositioningEngineStub? = null
+    private var m_state = InitState.FAIL_UNKNOWN
+    var mGps: Gps? = null
+    var AlarmSet_EmerIn = "Y" // 위험지역진입 알람설정
+    var AlarmSet_WorkTime = "Y" // 표준작업시간 알람설정
+    var AlarmSet_NotMove = "Y" // 미움직임 알람설정
+    var mUncaughtExceptionHandler: Thread.UncaughtExceptionHandler? = null
+    private var locationManager: LocationManager? = null
+//    private var mTask: TimerTask? = null
+//    private var mTimer: Timer? = null
+
+    private fun initBeacon() {
+        initLocationManager()
+
+//        mTask = object : TimerTask() {
+//            override fun run() {
+//                runOnUiThread {
+////                    mainInfoReload(true)
+////                    displayView(PageCode.MAIN_FRAGMENT_CODE, null)
+//
+//                    //SGA
+//                    DLog.e("bjj Beacon initBeacon")
+//
+//                    reqBLEInfo()
+//                }
+//            }
+//        }
+//
+//        mTimer = Timer()
+//        mTimer!!.schedule(mTask, 3000L)
+
+        (this@MainActivity as Activity).runOnUiThread {
+            Handler().postDelayed({
+                //                    mainInfoReload(true)
+//                    displayView(PageCode.MAIN_FRAGMENT_CODE, null)
+
+                //SGA
+                DLog.e("bjj Beacon initBeacon")
+
+                reqBLEInfo()
+            }, 300L)
+        }
+    }
+
+    override fun onCheckOut(p0: LMBeacon?) {
+        if (p0 != null) {
+            DLog.e("bjj Beacon onCheckOut = ${p0.name}")
+        }
+    }
+
+    override fun onCheckIn(p0: LMBeacon?) {
+        if (p0 != null) {
+            DLog.e("bjj Beacon onCheckIn = ${p0.name}")
+        }
+    }
+
+    override fun onNearBy(p0: java.util.ArrayList<LMBeacon>?) {
+        DLog.e("bjj Beacon onNearBy = ${p0}")
+    }
+
+    override fun onBluetoothStateChanged(p0: IPositioningInfoListener.BluetoothState?) {
+        DLog.e("bjj Beacon onBluetoothStateChanged = ${p0?.name}")
+    }
+
+    override fun onInitResult(initState: LMEnum.InitState?, p1: String?) {
+        DLog.e("bjj Beacon onInitResult = ${initState?.value()}, $p1")
+
+        if (initState == InitState.SUCCESS_INIT) {
+            m_state = initState
+            m_positioningEngine!!.addCheckInListener(this) // 체크인 이벤트 수신
+            m_positioningEngine!!.start()
+        }
+    }
+
+    override fun onBeaconList(p0: java.util.ArrayList<LMBeacon>?) {
+        DLog.e("bjj Beacon onBeaconList = $p0")
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        DLog.e("bjj Beacon onSensorChanged = ${event!!.sensor.type}")
+//        val TYPE_ACCELEROMETER = 1
+//        val TYPE_STEP_COUNTER = 19
+
+        if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
+            val currentTime = System.currentTimeMillis()
+            val gabOfTime = currentTime - lastTime
+            if (gabOfTime > 100) {
+                lastTime = currentTime
+
+                x = event.values[SensorManager.DATA_X]
+                y = event.values[SensorManager.DATA_Y]
+                z = event.values[SensorManager.DATA_Z]
+                speed = Math.abs(x + y + z - lastX - lastY - lastZ) / gabOfTime * 10000
+
+                if (speed > SHAKE_THRESHOLD) {
+                    val time = Date()
+                    stepTime = time.time
+                }
+
+                lastX = event.values[DATA_X]
+                lastY = event.values[DATA_Y]
+                lastZ = event.values[DATA_Z]
+            }
+        }
+
+        if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
+            val time = Date()
+            stepTime = time.time
+        }
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        DLog.e("bjj Beacon onAccuracyChanged = $sensor")
+    }
+
+    private val locationListener: LocationListener = object : LocationListener {
+        override fun onLocationChanged(location: Location) {
+            val lm = getSystemService(LOCATION_SERVICE) as LocationManager
+            val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:sss")
+            val resultdate = Date(System.currentTimeMillis())
+
+            lastLocation = location
+
+            if (location.provider == LocationManager.GPS_PROVIDER) {
+                isGPS = "1"
+            } else if (location.provider == LocationManager.NETWORK_PROVIDER) {
+                isGPS = "2"
+            } else {
+                isGPS = "3"
+            }
+
+            DLog.e("bjj GPS_FLAG : ", isGPS)
+            // Log.i("location Latitude : ", String.valueOf(lastLocation.getLatitude()));
+            // Log.i("location Longitude : ", String.valueOf(lastLocation.getLongitude()));
+            //displayView(PageCode.MAIN_FRAGMENT_CODE, null);
+        }
+
+        override fun onProviderDisabled(provider: String) {}
+        override fun onProviderEnabled(provider: String) {}
+        override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
+    }
+
+    ///// SGA-E /////
+    private fun reqBLEInfo() {
+        try {
+//            var LOC_AGREE = ""
+//            val swerk: String = getUserinfo().getString("SWERK")
+//            var resData: JSONObject? = null
+//            resData = getinterfaceUtill().reqBleInfo(getUserinfo(), swerk)
+
+//            if (resData.getString("TYPE") == "S") {
+//                val ET_74006 = resData.getJSONArray("ET_74006")
+//                for (i in 0 until ET_74006.length()) {
+//                    val result = ET_74006.getJSONObject(i)
+//                    val IWERK = result.getString("IWERK")
+//                    LOC_AGREE = result.getString("LOC_AGREE")
+//                    val ARBPL = result.getString("ARBPL")
+//                    val TPLNR = result.getString("TPLNR")
+//                    val EQUNR = result.getString("EQUNR")
+//                    val BLESEN_ID = result.getString("BLESEN_ID")
+//                    val BLESEN_MAC = result.getString("BLESEN_MAC")
+//                    val BLESEN_TYPE = result.getString("BLESEN_TYPE")
+//                    val PLTXT = result.getString("PLTXT")
+//                    val EQKTX = result.getString("EQKTX")
+//                    val EMER_AUTO_TIME = result.getString("EMER_AUTO_TIME")
+//                    val NOTMOVE_TIME = result.getString("NOTMOVE_TIME")
+//                    val NOTMOVE_AUTO_TIME = result.getString("NOTMOVE_AUTO_TIME")
+//                    val WORK_TIME = result.getString("WORK_TIME")
+//                    val FCL_ALIAS = result.getString("FCL_ALIAS")
+//                    AlarmSet_EmerIn = result.getString("DENGER_ZONE_YN")
+//                    AlarmSet_WorkTime = result.getString("WORK_TIME_YN")
+//                    AlarmSet_NotMove = result.getString("NOTMOVE_YN")
+//                    val ar_WORK_TIME = WORK_TIME.split(":").toTypedArray()
+//                    val in_WORK_TIME = ar_WORK_TIME[0].toInt() * 60 + ar_WORK_TIME[1].toInt()
+//                    val FAC_CODE = ARBPL + TPLNR + EQUNR
+//                    val FAC_NAME = "$PLTXT $EQKTX"
+//                    emerAutoTime = Integer.toString(EMER_AUTO_TIME.toInt())
+//                    notMoveTime = Integer.toString(NOTMOVE_TIME.toInt())
+//                    notMoveAutoTime = Integer.toString(NOTMOVE_AUTO_TIME.toInt())
+//                    if (BLESEN_TYPE == "B") {
+//                        arBeacon.add(Beacon(IWERK, BLESEN_ID, BLESEN_MAC, FAC_CODE, FAC_NAME, Integer.toString(in_WORK_TIME), FCL_ALIAS))
+//                    } else {
+//                        arOxy.add(Beacon(IWERK, BLESEN_ID, BLESEN_MAC, FAC_CODE, FAC_NAME))
+//                    }
+//                }
+//
+//                if (ET_74006.length() > 0) {
+//                    if (LOC_AGREE != "Y") {
+////                        val intent = Intent(this@MainActivity, PopupActivity::class.java)
+////                        intent.putExtra("type", "agree")
+////                        startActivityForResult(intent, REQUEST_LOC_AGREE)
+//                    } else {
+            DLog.e("bjj Beacon reqBLEInfo")
+
+            initAlarm()
+            initSensor()
+            initTimer()
+            initGps()
+            initPositioningEngine()
+            initBLE()
+//                    }
+//                }
+
+            blPlayAlarm = true
+//            } else {
+//                blPlayAlarm = false
+//                Toast.makeText(this@MainActivity, "안전관리정보 수신에 실패하였습니다.", Toast.LENGTH_SHORT).show()
+            //                seesionOut();
+//            }
+        } catch (e: Exception) {
+            blPlayAlarm = false
+            Toast.makeText(this@MainActivity, "안전관리정보 수신에 실패하였습니다.", Toast.LENGTH_SHORT).show()
+            //            seesionOut();
+        }
+    }
+
+    private fun initAlarm() {
+        DLog.e("bjj Beacon initAlarm")
+
+        powerManager = getSystemService(POWER_SERVICE) as PowerManager
+        wakeLock = powerManager?.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP or PowerManager.ON_AFTER_RELEASE, "myapp:MyWakelockTag")
+        vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
+//        sound_pool = SoundPool(5, AudioManager.STREAM_MUSIC, 0)
+//        sound_beep = sound_pool.load(this, R.raw.tagged, 1)
+//        textToSpeech = TextToSpeech(this) { status ->
+//            if (status == TextToSpeech.SUCCESS) {
+//                val result: Int = textToSpeech.setLanguage(Locale.KOREA)
+//                if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+//                    Toast.makeText(this@MainActivity, "이 언어는 지원하지 않습니다.", Toast.LENGTH_SHORT).show()
+//                } else {
+//                    textToSpeech.setPitch(0.7f)
+//                    textToSpeech.setSpeechRate(1.2f)
+//                }
+//            }
+//        }
+    }
+
+    private fun initSensor() {
+        DLog.e("bjj Beacon initSensor")
+
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        stepCountSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+        accelerormeterSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+
+        if (sensorManager != null) {
+            sensorManager!!.registerListener(this, stepCountSensor, SensorManager.SENSOR_DELAY_NORMAL)
+            sensorManager!!.registerListener(this, accelerormeterSensor, SensorManager.SENSOR_DELAY_GAME)
+        }
+    }
+
+    private fun initTimer() {
+        bleTimer = Timer()
+        bleTimerTask = object : TimerTask() {
+            override fun run() {
+                val time = Date()
+
+                DLog.e("bjj Beacon initTimer :: " + stepTime + " ^ " + blEmerIn)
+
+                if (stepTime != 0L && blEmerIn == true) {
+                    val sec = (time.time - stepTime) / 1000
+                    val min = (time.time - stepTime) / (1000 * 60)
+                    if (min >= notMoveTime.toInt()) {
+//                        playAlarm("NotMove")
+                        stepTime = 0
+                    }
+                }
+
+                if ((inEmerTime != 0L) && (blEmerIn == true) && (inEmerWorkTime != "")) {
+                    val sec = (time.time - inEmerTime) / 1000
+                    val min = (time.time - inEmerTime) / (1000 * 60)
+                    val worktime = inEmerWorkTime.toInt()
+                    if (worktime - 2 > 0) {
+                        if (min >= worktime - 2 && blWorkTime_Plus) {
+//                            playAlarm("WorkTime_Plus")
+                        }
+                    }
+                    if (min >= worktime) {
+//                        playAlarm("WorkTime")
+                        inEmerTime = 0
+                    }
+                }
+            }
+        }
+
+        bleTimer!!.schedule(bleTimerTask, 0, 1000)
+    }
+
+    private fun initGps() {
+        DLog.e("bjj Beacon initGps")
+
+        mGps = Gps(this@MainActivity)
+    }
+
+    private fun initPositioningEngine() {
+        m_positioningEngine = PositioningEngine.getInstance()
+
+        DLog.e("bjj Beacon initPositioningEngine "
+                + m_positioningEngine!!.isSupportBLE() + " ^ "
+                + m_state)
+
+        if (m_positioningEngine!!.isSupportBLE()) {
+            m_positioningEngine?.setDebugMode(true)
+
+            if (m_state == InitState.SUCCESS_INIT) {
+                m_positioningEngine!!.addCheckInListener(this)
+                m_positioningEngine!!.start()
+            } else {
+                m_positioningEngine!!.addInfoListener(this)
+                val config = LMConfig()
+                config.projectID = PROJECT_ID // Project ID
+                m_positioningEngine!!.init(this, config)
+            }
+        }
+    }
+
+    private fun initBLE() {
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+        scanFilters = Vector()
+
+        DLog.e("bjj Beacon initBLE")
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mBluetoothLeScanner = mBluetoothAdapter!!.getBluetoothLeScanner()
+            mBluetoothLeAdvertiser = mBluetoothAdapter!!.getBluetoothLeAdvertiser()
+            mScanSettings = ScanSettings.Builder()
+            mScanSettings!!.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+
+            val scanSettings = mScanSettings!!.build()
+            mScanCallback = object : ScanCallback() {
+                override fun onScanResult(callbackType: Int, result: ScanResult) {
+                    super.onScanResult(callbackType, result)
+                    try {
+                        for (i in arOxy.indices) {
+                            if (arOxy[i].name.equals(result.device.address.replace(":", ""))) {
+//                                makeGasBleData(result.scanRecord!!.bytes)
+
+                                DLog.e("bjj Beacon initBLE aa " + result.scanRecord!!.bytes)
+                            }
+                        }
+                        if (blOutStandby && inEmerBeacon == result.device.address.replace(":", "")) {
+//                            onCheckIn_2(inEmerBeacon)
+                            DLog.e("bjj Beacon initBLE bb " + inEmerBeacon)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+
+                override fun onBatchScanResults(results: List<ScanResult>) {
+                    super.onBatchScanResults(results)
+                }
+
+                override fun onScanFailed(errorCode: Int) {
+                    super.onScanFailed(errorCode)
+                }
+            }
+
+            mBluetoothLeScanner!!.startScan(scanFilters, scanSettings, mScanCallback)
+        }
+    }
+
+
+    private fun initLocationManager() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+//            Toast.makeText(this, "사용자의 위치 정보 권한을 허용하지 않았습니다", Toast.LENGTH_SHORT).show()
+
+            return
+        }
+
+        DLog.e("bjj Beacon initLocationManager " + locationManager)
+
+        if (locationManager == null) {
+            locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+            locationManager!!.removeUpdates(locationListener) // Stop the update if it is in progress.
+
+            locationManager!!.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 0f, locationListener)
+            locationManager!!.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0f, locationListener)
+            locationManager!!.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 5000, 0f, locationListener)
         }
     }
 }

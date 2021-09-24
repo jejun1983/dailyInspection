@@ -19,7 +19,7 @@
       android:layout_height="match_parent"
       android:layout_centerInParent="true"
       android:scaleType="center"
-      android:background="@drawable/intro" />
+      android:background="@drawable/splash" />
 
   <!--    <ImageView-->
   <!--        android:layout_width="wrap_content"-->

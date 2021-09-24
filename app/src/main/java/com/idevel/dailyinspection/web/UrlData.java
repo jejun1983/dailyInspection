@@ -11,10 +11,13 @@ import com.idevel.dailyinspection.utils.DLog;
  */
 public class UrlData {
     /**
-     * The Constant LOGIN_PAGE_URL.
+     * 시작 페이지
      */
-    public static String NORMAL_SERVER_URL = "https://www.1393kfsp.or.kr/login.php";
+    public static String NORMAL_SERVER_URL = "https://lgdc.wtest.biz/";
 
+    /**
+     * 파일 업로드 API url
+     */
     public static String getUploadUrl(Context context) {
         String url = "";
 
@@ -22,7 +25,7 @@ public class UrlData {
 //            url = SharedPreferencesUtil.getString(context, SharedPreferencesUtil.Cmd.SETTING_URL);
 //        } else {
 //            // 상용
-            url = "https://www.1393kfsp.or.kr/app/image.php";
+            url = "https://lgdc.wtest.biz/app/image.php";
 //        }
 
         DLog.e("bjj UrlData :: getUploadUrl "+url);
