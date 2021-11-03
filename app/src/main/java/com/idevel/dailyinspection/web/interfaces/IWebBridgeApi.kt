@@ -41,4 +41,7 @@ interface IWebBridgeApi {
     fun setQrFlash(isBool: Boolean)
     fun openQR()
     fun startNFC(isBool: Boolean)
+
+
+    fun getBattery()
 }

@@ -123,6 +123,14 @@ data class AutoLoginInfo(
     }
 }
 
+data class BatteryInfo(
+        @SerializedName("battery") val battery: Int
+) {
+    fun toJsonString(): String {
+        return gson().toJson(this)
+    }
+}
+
 data class AccountInfo(
         @SerializedName("id") val id: String,
         @SerializedName("pw") val pw: String

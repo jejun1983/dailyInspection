@@ -2,6 +2,8 @@ package com.idevel.dailyinspection.utils
 
 import android.app.ActivityManager
 import android.content.Context
+import android.content.Context.BATTERY_SERVICE
+import android.os.BatteryManager
 import android.os.Build
 import android.os.Environment
 import com.idevel.dailyinspection.activity.MainActivity
@@ -45,4 +47,9 @@ fun isCanAllFileAcess(): Boolean {
     }
 
     return true
+}
+
+fun getBatteryPercentage(context: Context): Int {
+    val bm = context.getSystemService(BATTERY_SERVICE) as BatteryManager
+    return bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
 }

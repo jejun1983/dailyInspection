@@ -138,10 +138,6 @@
         android:stateNotNeeded="true"
         tools:replace="android:screenOrientation" />
 
-    <!--beacon-->
-    <service
-        android:name="com.limei.positioningengine.PositioningEngineService"
-        android:process=":positioning" />
   </application>
 
   <uses-sdk tools:overrideLibrary="com.google.zxing.client.android" />
@@ -189,16 +185,4 @@
 
 
   <uses-permission android:name="android.permission.GET_TASKS" />
-
-  <!-- beacon-->
-  <uses-permission android:name="android.permission.BLUETOOTH" />
-  <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-  <uses-permission android:name="com.idevel.dailyinspection.LIMEI_POSITIONING_PERMISSION" />
-  <permission
-      android:name="com.idevel.dailyinspection.LIMEI_POSITIONING_PERMISSION"
-      android:protectionLevel="signature" >
-  </permission>
-  <uses-feature
-      android:name="android.hardware.bluetooth_le"
-      android:required="true" />
 </manifest>

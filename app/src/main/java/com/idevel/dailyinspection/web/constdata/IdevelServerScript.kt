@@ -6,6 +6,10 @@ package com.idevel.dailyinspection.web.constdata
  * @author  : jjbae
  */
 enum class IdevelServerScript(val scriptName: String) {
+    GET_BATTERY("getBattery"),
+    SET_BATTERY("setBattery"),
+
+
     GET_GPS_INFO("getGpsInfo"),
     GET_PUSH_REG_ID("getPushRegId"),
     GET_APP_VERSION("getAppVersion"),

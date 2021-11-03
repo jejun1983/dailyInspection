@@ -173,4 +173,10 @@ class MyWebInterface(private val mContext: Context, private val api: IWebBridgeA
         DLog.e("bjj data: startNFC " + isBool)
         api.startNFC(isBool)
     }
+
+    @JavascriptInterface
+    fun getBattery() {
+        DLog.e("bjj data: getBattery ")
+        api.getBattery()
+    }
 }
