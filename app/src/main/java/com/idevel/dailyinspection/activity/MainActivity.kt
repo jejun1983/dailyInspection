@@ -1718,13 +1718,13 @@ class MainActivity : FragmentActivity() {
 
 
             savedRootFilePath = "$savedRootFilePath${File.separator}Download${File.separator}"
-            val sohoDownloadFolder = File(savedRootFilePath, "${File.separator}1393")
+            val sohoDownloadFolder = File(savedRootFilePath, "${File.separator}dailyinspection")
 
             if (!sohoDownloadFolder.exists()) {
                 sohoDownloadFolder.mkdirs()
             }
 
-            val destinationFile = File(savedRootFilePath, "1393${File.separator}${fileName}")
+            val destinationFile = File(savedRootFilePath, "dailyinspection${File.separator}${fileName}")
             var inputStream: InputStream? = null
             var ost: OutputStream? = null
 
