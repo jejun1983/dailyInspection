@@ -156,6 +156,22 @@ data class NfcInfo(
     }
 }
 
+data class BeaconInfo(
+        @SerializedName("result") val result: String
+) {
+    fun toJsonString(): String {
+        return gson().toJson(this)
+    }
+}
+
+data class BleInfo(
+        @SerializedName("result") val result: String
+) {
+    fun toJsonString(): String {
+        return gson().toJson(this)
+    }
+}
+
 private fun gson(): Gson {
     return GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create()
 }

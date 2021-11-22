@@ -5,6 +5,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.PendingIntent
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.*
 import android.content.*
 import android.content.pm.PackageManager
@@ -22,6 +23,7 @@ import android.nfc.NfcManager
 import android.os.*
 import android.provider.MediaStore
 import android.provider.Settings
+import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.View.OnClickListener
@@ -39,6 +41,7 @@ import api.OnResultListener
 import com.idevel.dailyinspection.BuildConfig
 import com.idevel.dailyinspection.MyApplication
 import com.idevel.dailyinspection.R
+import com.idevel.dailyinspection.beacon.ble.GasBleData
 import com.idevel.dailyinspection.broadcast.DataSaverChangeReceiver
 import com.idevel.dailyinspection.broadcast.NetworkChangeReceiver
 import com.idevel.dailyinspection.dialog.AgentPopupDialog
@@ -62,11 +65,19 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import com.limei.indoorcommon.consts.LMEnum
+import com.limei.indoorcommon.model.beaconMgr.LMBeacon
+import com.limei.indoorcommon.model.configMgr.LMConfig
+import com.limei.positioningengine.ICheckInListener
+import com.limei.positioningengine.IPositioningEngineStub
+import com.limei.positioningengine.IPositioningInfoListener
+import com.limei.positioningengine.PositioningEngine
 import kr.co.medialog.ApiManager
 import kr.co.medialog.SettingInfoData
 import kr.co.medialog.UploadInfoData
 import okhttp3.ResponseBody
 import java.io.*
+import java.lang.Exception
 import java.lang.ref.WeakReference
 import java.net.URISyntaxException
 import java.net.URL
@@ -80,7 +91,7 @@ import kotlin.system.exitProcess
  *
  * @author : jjbae
  */
-class MainActivity : FragmentActivity() {
+class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListener {
     private var mAgentPopupDialog: AgentPopupDialog? = null
     private var mSplashView: View? = null //초기 로딩시 보여주기 위한 view.
     private var mErrorView: View? = null //The network error view.
@@ -113,6 +124,7 @@ class MainActivity : FragmentActivity() {
     private var isQrFlash: Boolean = false
     private var isNFCenable: Boolean = false
 
+    private var m_positioningEngine: IPositioningEngineStub? = null
 
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(LocaleWrapper.wrap(newBase))
@@ -223,7 +235,7 @@ class MainActivity : FragmentActivity() {
         }
 
         //battery
-        registerReceiver(batteryReceiver, IntentFilter (Intent.ACTION_BATTERY_CHANGED))
+        registerReceiver(batteryReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
     }
 
     override fun onPause() {
@@ -526,6 +538,10 @@ class MainActivity : FragmentActivity() {
 //            camera_test_btn?.visibility = View.VISIBLE
 //            gallery_test_btn?.visibility = View.VISIBLE
         }
+
+        // 비콘 초기화
+        initBeacon()
+        initGasBle()
     }
 
     private fun showAppFinishPopup() {
@@ -1844,5 +1860,211 @@ class MainActivity : FragmentActivity() {
                 DLog.e("bjj getBatteryPercentage :: batteryReceiver " + level)
             }
         }
+    }
+
+    private fun initBeacon() {
+        m_positioningEngine = PositioningEngine.getInstance()
+
+        val config = LMConfig()
+        config.projectID = "PRJ000001" // Project ID
+        config.useAssets = true
+        config.useBeaconList = true
+        config.isBeaconFromLBS = false
+        m_positioningEngine?.addCheckInListener(this@MainActivity)
+        m_positioningEngine?.addInfoListener(this@MainActivity)
+        m_positioningEngine?.setDebugMode(true)
+        m_positioningEngine?.init(this@MainActivity, config)
+    }
+
+    //2021. 11. 해당 Mac의 체크아웃 정보를 표출
+    override fun onCheckOut(p0: LMBeacon?) {
+        if (p0 != null) {
+//            DLog.e("bjj Beacone >> onCheckOut = ${p0.name} ^ ${p0.rssi}")
+
+            DLog.e("bjj Beacone >> onCheckOut = " + p0.toString())
+
+            mWebview?.sendEvent(IdevelServerScript.SET_BEACON_ON_CHECK_OUT, BeaconInfo(p0.toString()).toJsonString())
+        }
+    }
+
+    //2021. 11. 해당 Mac의 체크인 정보를 표출
+    override fun onCheckIn(p0: LMBeacon?) {
+        if (p0 != null) {
+//            DLog.e("bjj Beacone >> onCheckIn = ${p0.name} ^ ${p0.rssi}")
+
+            DLog.e("bjj Beacone >> onCheckIn = " + p0.toString())
+
+            mWebview?.sendEvent(IdevelServerScript.SET_BEACON_ON_CHECK_IN, BeaconInfo(p0.toString()).toJsonString())
+        }
+    }
+
+    //2021. 11. 해당 Mac의 정보를 표출
+    override fun onNearBy(p0: ArrayList<LMBeacon>?) {
+        if (p0 != null) {
+            if (p0.size > 0) {
+                DLog.e("bjj Beacone >> onNearBy = get ${p0.size} ^ ${p0[0]}")
+
+                mWebview?.sendEvent(IdevelServerScript.SET_BEACON_NEAR_BY, BeaconInfo(p0[0].toString()).toJsonString())
+            }
+        }
+    }
+
+    override fun onBluetoothStateChanged(p0: IPositioningInfoListener.BluetoothState?) {
+        DLog.e("bjj Beacone >> onBluetoothStateChanged = ${p0?.name}")
+
+        if (p0 != null) {
+            mWebview?.sendEvent(IdevelServerScript.SET_BEACON_STATE_CHANGE, BeaconInfo(p0.toString()).toJsonString())
+        }
+    }
+
+    override fun onInitResult(p0: LMEnum.InitState?, p1: String?) {
+        DLog.e("bjj Beacone >> onInitResult = ${p0?.value()}, $p1, $m_positioningEngine")
+
+        m_positioningEngine?.start()
+        var alBeacon: ArrayList<LMBeacon> = ArrayList()
+
+        for (i in 1..2000) {
+            if (i == 1) {
+                //2021. 11. DB 등록 MacAddress 을 For 문을 이용하여 나열 하시면 등록된 Mac 중 세기가 가장 센 장비가 체크인
+                val beacon = LMBeacon()
+
+                beacon.activeRange = 20.0F
+                beacon.txPower = -65
+                beacon.checkIn = "Y"
+                beacon.name = "0007790DE515"
+                beacon.macAddress = "0007790DE515"
+                alBeacon.add(beacon)
+
+                DLog.e("bjj Beacone >> onInitResult::addBeacon()")
+            } else {
+//                var beacon = LMBeacon();
+//                beacon.activeRange = 20.0F
+//                beacon.txPower = -65
+//                beacon.checkIn = "Y"
+//                beacon.name = "0007790CE${i}"
+//                //beacon.macAddress = "0007790CE773"
+//                alBeacon.add(beacon)
+            }
+        }
+
+        DLog.e("bjj Beacone >> onInitResult::addBeacon() size = ${alBeacon.size}")
+
+        m_positioningEngine?.addBeaconList(alBeacon)
+    }
+
+    override fun onBeaconList(p0: ArrayList<LMBeacon>?) {
+        DLog.e("bjj Beacone >> onBeaconList = $p0")
+    }
+
+    //2021.11.19 가스센서 호출
+    private var mBluetoothAdapter: BluetoothAdapter? = null
+    private var mBluetoothLeScanner: BluetoothLeScanner? = null
+    private var mScanSettings: ScanSettings.Builder? = null
+    private var scanFilters: List<ScanFilter>? = null
+    private var mScanCallback: ScanCallback? = null
+    private fun initGasBle() {
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+        scanFilters = Vector<ScanFilter>()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mBluetoothLeScanner = mBluetoothAdapter!!.bluetoothLeScanner
+            mScanSettings = ScanSettings.Builder()
+            mScanSettings!!.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+
+            val scanSettings: ScanSettings = mScanSettings!!.build()
+
+            mScanCallback = object : ScanCallback() {
+                override fun onScanResult(callbackType: Int, result: ScanResult) {
+                    super.onScanResult(callbackType, result)
+
+                    try {
+                        val mac = result.device.address.replace(":", "")
+
+                        // 체크인된 건물안에 설치된 가스센서 mac 주소를 함수로 지정하여 입력하시면 됩니다.
+                        if (mac.equals("0007790D026B")) {
+                            DLog.e("bjj gas mac equal 26B")
+
+                            if (GasBleData.isGalBleData(result.scanRecord!!.bytes)) {
+                                // make gasBLE data
+                                makeGasBleData(result.scanRecord!!.bytes)
+                            }
+                        } else {
+                            DLog.e("bjj gas mac not equal 26B")
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+
+            mBluetoothLeScanner!!.startScan(scanFilters, scanSettings, mScanCallback)
+        }
+    }
+
+    private fun makeGasBleData(scanRecord: ByteArray?) {
+        // BLE Scan Call-Back Data parsing
+        val data: GasBleData = GasBleData.parse(scanRecord)
+        // get O2 value
+        val strO2: String = if (data.isO2SensorEnabled()) data.getO2Live().toString() + " %" else "N/A"
+        // get CO value
+        val strCO: String = if (data.isCOSensorEnabled()) data.getCOLive().toString() + " ppm" else "N/A"
+        // get H2S value
+        val strH2S: String = if (data.isH2SSensorEnabled()) data.getH2SLive().toString() + " ppm" else "N/A"
+        // get CH4 value
+        val strCH4: String = if (data.isCH4SensorEnabled()) data.getCH4Live().toString() + "% LEL" else "N/A"
+        // get BatteryState
+        val strBatteryState: String = data.getBatteryState()
+        // get Temperature
+        val strTemperature: String = data.getTemperature().toString() + "°C"
+        // get Humidity
+        val strHumidity: String = data.getHumidity().toString() + "%"
+        // get isEmergency
+        val isEmergency: Boolean = data.isEmergency()
+
+
+        var resultStrBuffer = StringBuffer()
+        if (strO2.isNotEmpty()) {
+            resultStrBuffer.append("O2:").append(strO2).append(", ")
+        }
+        if (strCO.isNotEmpty()) {
+            resultStrBuffer.append("CO:").append(strCO).append(", ")
+        }
+        if (strH2S.isNotEmpty()) {
+            resultStrBuffer.append("H2S:").append(strH2S).append(", ")
+        }
+        if (strCH4.isNotEmpty()) {
+            resultStrBuffer.append("CH4:").append(strCH4).append(", ")
+        }
+        if (strBatteryState.isNotEmpty()) {
+            resultStrBuffer.append("BatteryState:").append(strBatteryState).append(", ")
+        }
+        if (strTemperature.isNotEmpty()) {
+            resultStrBuffer.append("Temperature:").append(strTemperature).append(", ")
+        }
+        if (strHumidity.isNotEmpty()) {
+            resultStrBuffer.append("Humidity:").append(strHumidity).append(", ")
+        }
+
+        if (isEmergency) {
+            resultStrBuffer.append("Emergency:").append("true")
+        } else {
+            resultStrBuffer.append("Emergency:").append("false")
+        }
+
+
+        mWebview?.sendEvent(IdevelServerScript.SET_BLE, BleInfo(resultStrBuffer.toString()).toJsonString())
+
+        // Put Data Array
+        // !@*#&!*@$^!$*!@(#!@$(!@#(!@&#(&!$ <-- Array 혹은 DB에 가공된 Data 수집해 놓고 사용
+        DLog.e("bjj gas makeGasBleData :: "
+                + "O2 : " + strO2
+                + ", CO : " + strCO
+                + ", H2S : " + strCH4
+                + ", CH4 : " + strH2S
+                + ", Battery : " + strBatteryState
+                + ", Tempe : " + strTemperature
+                + ", Humidity : " + strHumidity
+                + ", Emergency : " + isEmergency
+        )
     }
 }

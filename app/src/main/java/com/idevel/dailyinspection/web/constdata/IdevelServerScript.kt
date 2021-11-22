@@ -27,5 +27,11 @@ enum class IdevelServerScript(val scriptName: String) {
     SET_DOWNLOAD_FILE("downloadFile"),
 
     SET_NFC("setNFC"),
-    OPEN_QR("openQR")
+    OPEN_QR("openQR"),
+
+    SET_BEACON_ON_CHECK_OUT("setBeaconOnCheckOut"),
+    SET_BEACON_ON_CHECK_IN("setBeaconOnCheckIn"),
+    SET_BEACON_NEAR_BY("setBeaconNearBy"),
+    SET_BEACON_STATE_CHANGE("setBeaconStateChange"),
+    SET_BLE("setBle"),
 }
