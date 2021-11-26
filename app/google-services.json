@@ -1,34 +1,33 @@
 {
   "project_info": {
-    "project_number": "825275166644",
-    "firebase_url": "https://bottle-tok.firebaseio.com",
-    "project_id": "bottle-tok",
-    "storage_bucket": "bottle-tok.appspot.com"
+    "project_number": "416339219433",
+    "project_id": "dailyinspection-c707d",
+    "storage_bucket": "dailyinspection-c707d.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:825275166644:android:1267fd120a0cbc323d4ce1",
+        "mobilesdk_app_id": "1:416339219433:android:b4f009a649787d9fe53178",
         "android_client_info": {
           "package_name": "com.idevel.dailyinspection"
         }
       },
       "oauth_client": [
         {
-          "client_id": "825275166644-ge8etlgihs9qvtq78713n8ffv8chbdod.apps.googleusercontent.com",
+          "client_id": "416339219433-grcshlccqforn8gm9h964lrequuge167.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB837iMSZp3bYBi5vyVe_-L2V-q67gDGhc"
+          "current_key": "AIzaSyB710K4La3m-pcomTClVHw6BE6tMf4856s"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "825275166644-ge8etlgihs9qvtq78713n8ffv8chbdod.apps.googleusercontent.com",
+              "client_id": "416339219433-grcshlccqforn8gm9h964lrequuge167.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

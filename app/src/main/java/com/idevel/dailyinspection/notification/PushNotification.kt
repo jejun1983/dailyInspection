@@ -40,7 +40,7 @@ object PushNotification {
         val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID_PUSH)
-                .setSmallIcon(R.drawable.noti_icon)
+                .setSmallIcon(R.mipmap.app_icon_5_noti)
                 .setLargeIcon(image)
                 .setContentTitle(title)
                 .setAutoCancel(true)
