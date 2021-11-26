@@ -783,6 +783,19 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
             webviewDestroy(it)
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (mBluetoothLeScanner != null) {
+                mBluetoothLeScanner!!.stopScan(mScanCallback)
+            }
+        }
+
+        if (m_positioningEngine != null) {
+            m_positioningEngine!!.removeCheckInListener(this)
+            m_positioningEngine!!.removeInfoListener(this)
+            m_positioningEngine!!.stop()
+            m_positioningEngine!!.quit()
+        }
+
         super.onDestroy()
     }
 
