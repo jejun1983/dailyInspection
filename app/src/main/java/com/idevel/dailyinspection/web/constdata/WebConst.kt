@@ -3,6 +3,7 @@ package com.idevel.dailyinspection.web.constdata
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.SerializedName
+import com.idevel.dailyinspection.beacon.BeaconInterfaceData
 
 
 data class RequestCallPhoneInfo(
@@ -171,6 +172,12 @@ data class BleInfo(
         return gson().toJson(this)
     }
 }
+
+
+data class BeaconMacInfo(
+        @SerializedName("result") val result: BeaconInterfaceData
+)
+
 
 private fun gson(): Gson {
     return GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create()

@@ -1,5 +1,7 @@
 package com.idevel.dailyinspection.web.interfaces
 
+import com.idevel.dailyinspection.beacon.BeaconInterfaceData
+import com.idevel.dailyinspection.web.constdata.BeaconMacInfo
 import com.idevel.dailyinspection.web.constdata.RequestBuyProductInfo
 import com.idevel.dailyinspection.web.constdata.RequestCallPhoneInfo
 import com.idevel.dailyinspection.web.constdata.RequestExternalWebInfo
@@ -44,4 +46,6 @@ interface IWebBridgeApi {
 
 
     fun getBattery()
+
+    fun startBeacon(data: BeaconMacInfo)
 }

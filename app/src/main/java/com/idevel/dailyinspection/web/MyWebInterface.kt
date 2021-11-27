@@ -4,11 +4,9 @@ import android.content.Context
 import android.webkit.JavascriptInterface
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.idevel.dailyinspection.beacon.BeaconInterfaceData
 import com.idevel.dailyinspection.utils.DLog
-import com.idevel.dailyinspection.web.constdata.OpenSharePopupInfo
-import com.idevel.dailyinspection.web.constdata.RequestBuyProductInfo
-import com.idevel.dailyinspection.web.constdata.RequestCallPhoneInfo
-import com.idevel.dailyinspection.web.constdata.RequestExternalWebInfo
+import com.idevel.dailyinspection.web.constdata.*
 import com.idevel.dailyinspection.web.interfaces.IWebBridgeApi
 
 /**
@@ -178,5 +176,14 @@ class MyWebInterface(private val mContext: Context, private val api: IWebBridgeA
     fun getBattery() {
         DLog.e("bjj data: getBattery ")
         api.getBattery()
+    }
+
+
+    @JavascriptInterface
+    fun startBeacon(jsonData: String) {
+        val data = gson().fromJson(jsonData, BeaconMacInfo::class.java)
+        DLog.e("bjj data: startBeacon " + data)
+
+        api.startBeacon(data)
     }
 }

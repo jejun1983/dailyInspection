@@ -41,6 +41,7 @@ import api.OnResultListener
 import com.idevel.dailyinspection.BuildConfig
 import com.idevel.dailyinspection.MyApplication
 import com.idevel.dailyinspection.R
+import com.idevel.dailyinspection.beacon.BeaconInterfaceData
 import com.idevel.dailyinspection.beacon.ble.GasBleData
 import com.idevel.dailyinspection.broadcast.DataSaverChangeReceiver
 import com.idevel.dailyinspection.broadcast.NetworkChangeReceiver
@@ -125,6 +126,8 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
     private var isNFCenable: Boolean = false
 
     private var m_positioningEngine: IPositioningEngineStub? = null
+
+    private var mBeaconInfo: ArrayList<BeaconInterfaceData.beaconInfoItem>? = null
 
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(LocaleWrapper.wrap(newBase))
@@ -381,10 +384,6 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
             override fun onPageFinished(view: WebView, url: String) {
                 super.onPageFinished(view, url)
 
-                if (url == "https://lgdc.wtest.biz/login/checkForm.php") {
-                    removeSplash()
-                }
-
                 DLog.e("bjj mWebViewClient onPageFinished : $url, ${mSettingdata?.main_url}")
             }
 
@@ -538,10 +537,6 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
 //            camera_test_btn?.visibility = View.VISIBLE
 //            gallery_test_btn?.visibility = View.VISIBLE
         }
-
-        // 비콘 초기화
-        initBeacon()
-        initGasBle()
     }
 
     private fun showAppFinishPopup() {
@@ -1229,6 +1224,12 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
                 mWebview?.sendEvent(IdevelServerScript.GET_BATTERY, BatteryInfo(battery).toJsonString())
             }
         }
+
+        override fun startBeacon(data: BeaconMacInfo) {
+            (this@MainActivity as Activity).runOnUiThread {
+                this@MainActivity.startBeacon(data.result.beaconInfo)
+            }
+        }
     }
 
     companion object {
@@ -1875,6 +1876,27 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
         }
     }
 
+    private fun startBeacon(beaconInfo: ArrayList<BeaconInterfaceData.beaconInfoItem>) {
+        if (mBeaconInfo?.isNotEmpty() == true) {
+            mBeaconInfo?.clear()
+        }
+
+        mBeaconInfo = beaconInfo
+
+
+        for (i in mBeaconInfo!!.indices) {
+            DLog.e("bjj Beacone aaaaaaaaaaaaaa bb >> initGasBle match : "
+                    + i + " ^ "
+                    + mBeaconInfo!!.size + " ^ "
+                    + mBeaconInfo!!.get(i).macAddress)
+        }
+
+        // 비콘 초기화
+        initBeacon()
+        initGasBle()
+    }
+
+
     private fun initBeacon() {
         m_positioningEngine = PositioningEngine.getInstance()
 
@@ -1936,27 +1958,25 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
         m_positioningEngine?.start()
         var alBeacon: ArrayList<LMBeacon> = ArrayList()
 
-        for (i in 1..2000) {
-            if (i == 1) {
+        if (mBeaconInfo != null) {
+            for (i in mBeaconInfo!!.indices) {
                 //2021. 11. DB 등록 MacAddress 을 For 문을 이용하여 나열 하시면 등록된 Mac 중 세기가 가장 센 장비가 체크인
                 val beacon = LMBeacon()
 
                 beacon.activeRange = 20.0F
                 beacon.txPower = -65
                 beacon.checkIn = "Y"
-                beacon.name = "0007790DE515"
-                beacon.macAddress = "0007790DE515"
+//                beacon.name = "0007790DE515"
+//                beacon.macAddress = "0007790DE515"
+
+                beacon.name = mBeaconInfo!!.get(i).macAddress
+                beacon.macAddress = mBeaconInfo!!.get(i).macAddress
+
                 alBeacon.add(beacon)
 
-                DLog.e("bjj Beacone >> onInitResult::addBeacon()")
-            } else {
-//                var beacon = LMBeacon();
-//                beacon.activeRange = 20.0F
-//                beacon.txPower = -65
-//                beacon.checkIn = "Y"
-//                beacon.name = "0007790CE${i}"
-//                //beacon.macAddress = "0007790CE773"
-//                alBeacon.add(beacon)
+                DLog.e("bjj Beacone >> onInitResult find beacon :: "
+                        + i + " ^ "
+                        + mBeaconInfo!!.get(i).macAddress)
             }
         }
 
@@ -1993,16 +2013,20 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
                     try {
                         val mac = result.device.address.replace(":", "")
 
-                        // 체크인된 건물안에 설치된 가스센서 mac 주소를 함수로 지정하여 입력하시면 됩니다.
-                        if (mac.equals("0007790D026B")) {
-                            DLog.e("bjj gas mac equal 26B")
+                        if (mBeaconInfo != null) {
+                            for (i in mBeaconInfo!!.indices) {
 
-                            if (GasBleData.isGalBleData(result.scanRecord!!.bytes)) {
-                                // make gasBLE data
-                                makeGasBleData(result.scanRecord!!.bytes)
+                                if (mac == mBeaconInfo!!.get(i).macAddress) {
+                                    if (GasBleData.isGalBleData(result.scanRecord!!.bytes)) {
+                                        // make gasBLE data
+                                        makeGasBleData(result.scanRecord!!.bytes, mBeaconInfo!!.get(i).macAddress!!)
+
+                                        DLog.e("bjj Beacone aaaaaaaaaaaaaa bb >> initGasBle match : "
+                                                + i + " ^ "
+                                                + mBeaconInfo!!.get(i).macAddress)
+                                    }
+                                }
                             }
-                        } else {
-                            DLog.e("bjj gas mac not equal 26B")
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -2014,7 +2038,7 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
         }
     }
 
-    private fun makeGasBleData(scanRecord: ByteArray?) {
+    private fun makeGasBleData(scanRecord: ByteArray?, mac: String) {
         // BLE Scan Call-Back Data parsing
         val data: GasBleData = GasBleData.parse(scanRecord)
         // get O2 value
@@ -2033,7 +2057,6 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
         val strHumidity: String = data.getHumidity().toString() + "%"
         // get isEmergency
         val isEmergency: Boolean = data.isEmergency()
-
 
         var resultStrBuffer = StringBuffer()
         if (strO2.isNotEmpty()) {
@@ -2059,10 +2082,12 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
         }
 
         if (isEmergency) {
-            resultStrBuffer.append("Emergency:").append("true")
+            resultStrBuffer.append("Emergency:").append("true").append(", ")
         } else {
-            resultStrBuffer.append("Emergency:").append("false")
+            resultStrBuffer.append("Emergency:").append("false").append(", ")
         }
+
+        resultStrBuffer.append("macAddress:").append(mac)
 
 
         mWebview?.sendEvent(IdevelServerScript.SET_BLE, BleInfo(resultStrBuffer.toString()).toJsonString())
