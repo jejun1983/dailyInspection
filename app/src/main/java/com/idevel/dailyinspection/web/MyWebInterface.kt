@@ -25,156 +25,181 @@ class MyWebInterface(private val mContext: Context, private val api: IWebBridgeA
 
     @JavascriptInterface
     fun removeSplash() {
-        DLog.e("bjj data: removeSplash ")
+        DLog.e("bjj data: call removeSplash ")
+
         api.removeSplash()
     }
 
     @JavascriptInterface
     fun getPushRegId() {
-        DLog.e("bjj data: getPushRegId ")
+        DLog.e("bjj data: call getPushRegId ")
+
         api.getPushRegId()
     }
 
     @JavascriptInterface
     fun restartApp() {
-        DLog.e("bjj data: restartApp ")
+        DLog.e("bjj data: call restartApp ")
+
         api.restartApp()
     }
 
     @JavascriptInterface
     fun finishApp() {
-        DLog.e("bjj data: finishApp ")
+        DLog.e("bjj data: call finishApp ")
+
         api.finishApp()
     }
 
     @JavascriptInterface
     fun getAppVersion() {
-        DLog.e("bjj data: getAppVersion ")
+        DLog.e("bjj data: call getAppVersion ")
+
         api.getAppVersion()
     }
 
     @JavascriptInterface
     fun requestCallPhone(jsonData: String) {
         val data = gson().fromJson(jsonData, RequestCallPhoneInfo::class.java)
-        DLog.e("bjj data: requestCallPhone " + data)
+        DLog.e("bjj data: call requestCallPhone " + data)
+
         api.requestCallPhone(data)
     }
 
     @JavascriptInterface
     fun requestExternalWeb(jsonData: String) {
         val data = gson().fromJson(jsonData, RequestExternalWebInfo::class.java)
-        DLog.e("bjj data: requestExternalWeb " + data)
+        DLog.e("bjj data: call requestExternalWeb " + data)
+
         api.requestExternalWeb(data)
     }
 
     @JavascriptInterface
     fun openSharePopup(jsonData: String) {
         val data = gson().fromJson(jsonData, OpenSharePopupInfo::class.java)
-        DLog.e("bjj data: openSharePopup " + jsonData)
+        DLog.e("bjj data: call openSharePopup " + jsonData)
+
         api.openSharePopup(data.text)
     }
 
     @JavascriptInterface
     fun pageClearHistory() {
-        DLog.e("bjj data: pageClearHistory ")
+        DLog.e("bjj data: call pageClearHistory ")
+
         api.pageClearHistory()
     }
 
     @JavascriptInterface
     fun getGpsInfo() {
-        DLog.e("bjj data: getLocation ")
+        DLog.e("bjj data: call getLocation ")
+
         api.getGpsInfo()
     }
 
     @JavascriptInterface
     fun readyOneStoreBilling() {
-        DLog.e("bjj data: readyOneStoreBilling ")
+        DLog.e("bjj data: call readyOneStoreBilling ")
+
         api.readyOneStoreBilling()
     }
 
     @JavascriptInterface
     fun requestBuyProduct(jsonData: String) {
         val data = gson().fromJson(jsonData, RequestBuyProductInfo::class.java)
-        DLog.e("bjj data: requestBuyProduct " + jsonData)
+        DLog.e("bjj data: call requestBuyProduct " + jsonData)
+
         api.requestBuyProduct(data)
     }
 
     @JavascriptInterface
     fun openCamera(type: String, param: String) {
-        DLog.e("bjj data: openCamera " + type + " ^ " + param)
+        DLog.e("bjj data: call openCamera " + type + " ^ " + param)
+
         api.openCamera(type, param)
     }
 
     @JavascriptInterface
     fun openGallery(type: String, param: String) {
-        DLog.e("bjj data: openGallery " + type + " ^ " + param)
+        DLog.e("bjj data: call openGallery " + type + " ^ " + param)
+
         api.openGallery(type, param)
     }
 
     @JavascriptInterface
     fun setPushVibrate(isBool: Boolean) {
-        DLog.e("bjj data: setPushVibrate ")
+        DLog.e("bjj data: call setPushVibrate ")
+
         api.setPushVibrate(isBool)
     }
 
     @JavascriptInterface
     fun setPushBeep(isBool: Boolean) {
-        DLog.e("bjj data: setPushBeep ")
+        DLog.e("bjj data: call setPushBeep ")
+
         api.setPushBeep(isBool)
     }
 
 
     @JavascriptInterface
     fun setAutoLogin(isAuto: Boolean) {
-        DLog.e("bjj data: setAutoLogin " + isAuto)
+        DLog.e("bjj data: call setAutoLogin " + isAuto)
+
         api.setAutoLogin(isAuto)
     }
 
     @JavascriptInterface
     fun getAutoLogin() {
-        DLog.e("bjj data: getAutoLogin ")
+        DLog.e("bjj data: call getAutoLogin ")
+
         api.getAutoLogin()
     }
 
     @JavascriptInterface
     fun setAccount(id: String, pw: String) {
-        DLog.e("bjj data: setAccount " + id + " ^ " + pw)
+        DLog.e("bjj data: call setAccount " + id + " ^ " + pw)
+
         api.setAccount(id, pw)
     }
 
     @JavascriptInterface
     fun getAccount() {
-        DLog.e("bjj data: getAccount ")
+        DLog.e("bjj data: call getAccount ")
+
         api.getAccount()
     }
 
     @JavascriptInterface
     fun downloadFile(fileURL: String, fileName: String) {
-        DLog.e("bjj data: downloadFile " + fileURL + " ^ " + fileName)
+        DLog.e("bjj data: call downloadFile " + fileURL + " ^ " + fileName)
+
         api.downloadFile(fileURL, fileName)
     }
 
     @JavascriptInterface
     fun setQrFlash(isBool: Boolean) {
-        DLog.e("bjj data: setQrFlash " + isBool)
+        DLog.e("bjj data: call setQrFlash " + isBool)
+
         api.setQrFlash(isBool)
     }
 
     @JavascriptInterface
     fun openQR() {
-        DLog.e("bjj data: openQR ")
+        DLog.e("bjj data: call openQR ")
+
         api.openQR()
     }
 
     @JavascriptInterface
     fun startNFC(isBool: Boolean) {
-        DLog.e("bjj data: startNFC " + isBool)
+        DLog.e("bjj data: call startNFC " + isBool)
+
         api.startNFC(isBool)
     }
 
     @JavascriptInterface
     fun getBattery() {
-        DLog.e("bjj data: getBattery ")
+        DLog.e("bjj data: call getBattery ")
+
         api.getBattery()
     }
 
@@ -182,7 +207,7 @@ class MyWebInterface(private val mContext: Context, private val api: IWebBridgeA
     @JavascriptInterface
     fun startBeacon(jsonData: String) {
         val data = gson().fromJson(jsonData, BeaconMacInfo::class.java)
-        DLog.e("bjj data: startBeacon " + data)
+        DLog.e("bjj data: call startBeacon " + data)
 
         api.startBeacon(data)
     }

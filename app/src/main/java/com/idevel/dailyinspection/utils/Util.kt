@@ -41,13 +41,13 @@ fun getUUID(context: Context): String {
     return uuid
 }
 
-fun isCanAllFileAcess(): Boolean {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        return Environment.isExternalStorageManager()
-    }
-
-    return true
-}
+//fun isCanAllFileAcess(): Boolean {
+//    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//        return Environment.isExternalStorageManager()
+//    }
+//
+//    return true
+//}
 
 fun getBatteryPercentage(context: Context): Int {
     val bm = context.getSystemService(BATTERY_SERVICE) as BatteryManager

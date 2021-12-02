@@ -16,6 +16,7 @@ import android.location.Geocoder
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.media.MediaScannerConnection
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.nfc.NfcAdapter
@@ -366,9 +367,9 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
         mHandler.sendEmptyMessageDelayed(HANDLER_NETWORK_TIMER, PING_TIME.toLong())
 
         //모든 파일 접근 가능 권한
-        if (!isCanAllFileAcess()) {
-            gotoAllFileAcessPermission()
-        }
+//        if (!isCanAllFileAcess()) {
+//            gotoAllFileAcessPermission()
+//        }
 
         mWebview?.setBackgroundColor(Color.WHITE)
         mWebview?.setJSInterface(iWebBridgeApi)
@@ -649,22 +650,7 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
         val alertDialog = CustomAlertDialog(this)
         alertDialog.setCancelable(false)
 
-//        if (permissionStr.contains("READ_PHONE_NUMBERS")) {
-//            alertDialog.setDataSaveLayout(R.string.permissionDeny_title, R.string.permissionDeny_msg1)
-//        } else if (permissionStr.contains("READ_PHONE_STATE")) {
-//            alertDialog.setDataSaveLayout(R.string.permissionDeny_title, R.string.permissionDeny_msg1)
-//        } else if (permissionStr.contains("MANAGE_EXTERNAL_STORAGE")) {
-//            alertDialog.setDataSaveLayout(R.string.permissionDeny_title, R.string.permissionDeny_msg5)
-//        } else if (permissionStr.contains("READ_EXTERNAL_STORAGE")) {
-//            alertDialog.setDataSaveLayout(R.string.permissionDeny_title, R.string.permissionDeny_msg2)
-//        } else if (permissionStr.contains("WRITE_EXTERNAL_STORAGE")) {
-//            alertDialog.setDataSaveLayout(R.string.permissionDeny_title, R.string.permissionDeny_msg2)
-//        } else if (permissionStr.contains("READ_CALL_LOG")) {
-//            alertDialog.setDataSaveLayout(R.string.permissionDeny_title, R.string.permissionDeny_msg3)
-//        } else {
         alertDialog.setDataSaveLayout(R.string.permissionDeny_title, R.string.permissionDeny_msg4)
-//        }
-
         alertDialog.setButtonString(R.string.popup_btn_ok_dta_save, R.string.popup_btn_cancel_dta_save)
 
         alertDialog.setOkClickListener(OnClickListener { v ->
@@ -672,13 +658,13 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
             when (v.id) {
                 R.id.btn_cancel -> finish()
                 R.id.btn_ok -> {
-                    if (permissionStr.contains("MANAGE_EXTERNAL_STORAGE")) {
-                        gotoAllFileAcessPermission()
-                    } else {
-                        val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                        intent.data = Uri.parse("package:$packageName")
-                        startActivity(intent)
-                    }
+//                    if (permissionStr.contains("MANAGE_EXTERNAL_STORAGE")) {
+//                        gotoAllFileAcessPermission()
+//                    } else {
+                    val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    intent.data = Uri.parse("package:$packageName")
+                    startActivity(intent)
+//                    }
 
                     finish()
                 }
@@ -690,13 +676,13 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
         }
     }
 
-    private fun gotoAllFileAcessPermission() {
-        val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-        val uri = Uri.fromParts("package", packageName, null)
-        intent.data = uri
-
-        ContextCompat.startActivity(this@MainActivity, intent, ActivityOptionsCompat.makeBasic().toBundle())
-    }
+//    private fun gotoAllFileAcessPermission() {
+//        val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+//        val uri = Uri.fromParts("package", packageName, null)
+//        intent.data = uri
+//
+//        ContextCompat.startActivity(this@MainActivity, intent, ActivityOptionsCompat.makeBasic().toBundle())
+//    }
 
     /**
      * Show network error dlg.
@@ -978,18 +964,20 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
                             DLog.e("bjj PERMISSION checkPermission onPermissionsChecked bb ==>> "
                                     + Build.VERSION.SDK_INT)
 
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                                DLog.e("bjj PERMISSION checkPermission onPermissionsChecked bb ==>> "
-                                        + Build.VERSION.SDK_INT + " ^ "
-                                        + Environment.isExternalStorageManager())
-                                if (Environment.isExternalStorageManager()) {
-                                    setMainView()
-                                } else {
-                                    showPermissionDenyDialog("MANAGE_EXTERNAL_STORAGE")
-                                }
-
-                                return
-                            }
+//                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//                                DLog.e("bjj PERMISSION checkPermission onPermissionsChecked bb ==>> "
+//                                        + Build.VERSION.SDK_INT + " ^ "
+//                                        + Environment.isExternalStorageManager())
+//                                if (Environment.isExternalStorageManager()) {
+//                                    setMainView()
+//                                } else {
+//                                    showPermissionDenyDialog("MANAGE_EXTERNAL_STORAGE")
+//                                }
+//
+//                                setMainView()
+//
+//                                return
+//                            }
 
                             showPermissionDenyDialog("")
                         } else {
@@ -1730,110 +1718,124 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
 
     @Synchronized
     private fun saveRecordFile(body: ResponseBody, fileName: String): Boolean {
-        try {
-            // 파일있으면 삭제부터 한다.
-//            deleteFile(fileName, pkgName)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val fos: OutputStream
+            val imageFile: File? = null
+            var imageUri: Uri? = null
+            val resolver: ContentResolver = contentResolver
+            val contentValues = ContentValues()
 
-//      1
-            val rootPath = Environment.getExternalStorageDirectory().absolutePath
-            var savedRootFilePath = rootPath
-//      2
-//            var savedRootFilePath = if (rootPath.endsWith("/")) {
-//                "${rootPath}Android${File.separator}data${File.separator}${packageName}"
-//            } else {
-//                "${rootPath}${File.separator}Android${File.separator}data${File.separator}${packageName}"
-//            }
-//      3
-//            var savedRootFilePath = getExternalFilesDir(Environment.DIRECTORY_MOVIES)!!.path
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM" + File.separator + "idevel")
+            imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+            fos = resolver.openOutputStream(imageUri!!)!!
 
+            fos.flush()
+            fos.close()
 
-            savedRootFilePath = "$savedRootFilePath${File.separator}Download${File.separator}"
-            val sohoDownloadFolder = File(savedRootFilePath, "${File.separator}dailyinspection")
+            if (imageFile != null) {
+                MediaScannerConnection.scanFile(this@MainActivity, arrayOf(imageFile.toString()), null, null)
+                imageUri = Uri.fromFile(imageFile)
 
-            if (!sohoDownloadFolder.exists()) {
-                sohoDownloadFolder.mkdirs()
-            }
-
-            val destinationFile = File(savedRootFilePath, "dailyinspection${File.separator}${fileName}")
-            var inputStream: InputStream? = null
-            var ost: OutputStream? = null
-
-            DLog.e("bjj saveRecordFile :: INIT :: "
-                    + savedRootFilePath
-                    + " ^ " + sohoDownloadFolder.exists()
-                    + " ^ " + sohoDownloadFolder.path
-                    + " ^ " + sohoDownloadFolder.isDirectory
-                    + " ^ " + sohoDownloadFolder.isFile
-                    + " ^ " + destinationFile.path
-                    + " ^ " + destinationFile.isDirectory
-                    + " ^ " + destinationFile.isFile)
-            try {
-                try {
-                    inputStream = body.byteStream()
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
-
-                ost = FileOutputStream(destinationFile, true)
-
-                val data = ByteArray(32 * 1024)
-                var fileSizeDownloaded: Long = 0
-                val fileSize = body.contentLength()
-
-                while (true) {
-                    val read = inputStream?.read(data) ?: break
-
-                    if (read == -1) {
-                        break
-                    }
-
-                    if (destinationFile.length() == fileSize) {
-                        break
-                    }
-
-                    DLog.e("bjj saveRecordFile :: ING "
-                            + destinationFile.path + " ^ "
-                            + destinationFile.length() + " ^ "
-                            + fileSizeDownloaded + " ^ "
-                            + fileSize)
-
-                    ost.write(data, 0, read)
-                    fileSizeDownloaded += read.toLong()
-                }
-
-                ost.flush()
-
-                DLog.e("bjj saveRecordFile :: DONE "
-                        + destinationFile.path + " ^ "
-                        + destinationFile.length())
-
-                (this@MainActivity as Activity).runOnUiThread {
-                    openFileManager(destinationFile.path, true)
-                }
+                openFileManager(imageUri.path!!, true)
 
                 return true
+            } else {
+                return false
+            }
+        } else {
+            try {
+                val rootPath = Environment.getExternalStorageDirectory().absolutePath
+                var savedRootFilePath = rootPath
+                savedRootFilePath = "$savedRootFilePath${File.separator}Download${File.separator}"
+                val sohoDownloadFolder = File(savedRootFilePath, "${File.separator}dailyinspection")
+
+                if (!sohoDownloadFolder.exists()) {
+                    sohoDownloadFolder.mkdirs()
+                }
+
+                val destinationFile = File(savedRootFilePath, "dailyinspection${File.separator}${fileName}")
+                var inputStream: InputStream? = null
+                var ost: OutputStream? = null
+
+                DLog.e("bjj saveRecordFile :: INIT :: "
+                        + savedRootFilePath
+                        + " ^ " + sohoDownloadFolder.exists()
+                        + " ^ " + sohoDownloadFolder.path
+                        + " ^ " + sohoDownloadFolder.isDirectory
+                        + " ^ " + sohoDownloadFolder.isFile
+                        + " ^ " + destinationFile.path
+                        + " ^ " + destinationFile.isDirectory
+                        + " ^ " + destinationFile.isFile)
+                try {
+                    try {
+                        inputStream = body.byteStream()
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+
+                    ost = FileOutputStream(destinationFile, true)
+
+                    val data = ByteArray(32 * 1024)
+                    var fileSizeDownloaded: Long = 0
+                    val fileSize = body.contentLength()
+
+                    while (true) {
+                        val read = inputStream?.read(data) ?: break
+
+                        if (read == -1) {
+                            break
+                        }
+
+                        if (destinationFile.length() == fileSize) {
+                            break
+                        }
+
+                        DLog.e("bjj saveRecordFile :: ING "
+                                + destinationFile.path + " ^ "
+                                + destinationFile.length() + " ^ "
+                                + fileSizeDownloaded + " ^ "
+                                + fileSize)
+
+                        ost.write(data, 0, read)
+                        fileSizeDownloaded += read.toLong()
+                    }
+
+                    ost.flush()
+
+                    DLog.e("bjj saveRecordFile :: DONE "
+                            + destinationFile.path + " ^ "
+                            + destinationFile.length())
+
+                    (this@MainActivity as Activity).runOnUiThread {
+                        openFileManager(destinationFile.path, true)
+                    }
+
+                    return true
+                } catch (e: IOException) {
+                    e.printStackTrace()
+
+                    (this@MainActivity as Activity).runOnUiThread {
+                        openFileManager(destinationFile.path, false)
+                    }
+
+                    DLog.e("bjj saveRecordFile :: FAIL aa " + e)
+                    return false
+                } finally {
+                    inputStream?.close()
+                    ost?.close()
+                }
             } catch (e: IOException) {
                 e.printStackTrace()
 
                 (this@MainActivity as Activity).runOnUiThread {
-                    openFileManager(destinationFile.path, false)
+                    openFileManager("", false)
                 }
 
-                DLog.e("bjj saveRecordFile :: FAIL aa " + e)
+                DLog.e("bjj saveRecordFile :: FAIL bb " + e)
                 return false
-            } finally {
-                inputStream?.close()
-                ost?.close()
             }
-        } catch (e: IOException) {
-            e.printStackTrace()
-
-            (this@MainActivity as Activity).runOnUiThread {
-                openFileManager("", false)
-            }
-
-            DLog.e("bjj saveRecordFile :: FAIL bb " + e)
-            return false
         }
     }
 
@@ -1885,7 +1887,7 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
 
 
         for (i in mBeaconInfo!!.indices) {
-            DLog.e("bjj Beacone aaaaaaaaaaaaaa bb >> initGasBle match : "
+            DLog.e("bjj Beacone startBeacon : "
                     + i + " ^ "
                     + mBeaconInfo!!.size + " ^ "
                     + mBeaconInfo!!.get(i).macAddress)
@@ -1914,9 +1916,7 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
     //2021. 11. 해당 Mac의 체크아웃 정보를 표출
     override fun onCheckOut(p0: LMBeacon?) {
         if (p0 != null) {
-//            DLog.e("bjj Beacone >> onCheckOut = ${p0.name} ^ ${p0.rssi}")
-
-            DLog.e("bjj Beacone >> onCheckOut = " + p0.toString())
+            DLog.e("bjj Beacone onCheckOut = " + p0.toString())
 
             mWebview?.sendEvent(IdevelServerScript.SET_BEACON_ON_CHECK_OUT, BeaconInfo(p0.toString()).toJsonString())
         }
@@ -1925,9 +1925,7 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
     //2021. 11. 해당 Mac의 체크인 정보를 표출
     override fun onCheckIn(p0: LMBeacon?) {
         if (p0 != null) {
-//            DLog.e("bjj Beacone >> onCheckIn = ${p0.name} ^ ${p0.rssi}")
-
-            DLog.e("bjj Beacone >> onCheckIn = " + p0.toString())
+            DLog.e("bjj Beacone onCheckIn = " + p0.toString())
 
             mWebview?.sendEvent(IdevelServerScript.SET_BEACON_ON_CHECK_IN, BeaconInfo(p0.toString()).toJsonString())
         }
@@ -1937,7 +1935,7 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
     override fun onNearBy(p0: ArrayList<LMBeacon>?) {
         if (p0 != null) {
             if (p0.size > 0) {
-                DLog.e("bjj Beacone >> onNearBy = get ${p0.size} ^ ${p0[0]}")
+                DLog.e("bjj Beacone onNearBy = get ${p0.size} ^ ${p0[0]}")
 
                 mWebview?.sendEvent(IdevelServerScript.SET_BEACON_NEAR_BY, BeaconInfo(p0[0].toString()).toJsonString())
             }
@@ -1945,7 +1943,7 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
     }
 
     override fun onBluetoothStateChanged(p0: IPositioningInfoListener.BluetoothState?) {
-        DLog.e("bjj Beacone >> onBluetoothStateChanged = ${p0?.name}")
+        DLog.e("bjj Beacone onBluetoothStateChanged = ${p0?.name}")
 
         if (p0 != null) {
             mWebview?.sendEvent(IdevelServerScript.SET_BEACON_STATE_CHANGE, BeaconInfo(p0.toString()).toJsonString())
@@ -1953,7 +1951,7 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
     }
 
     override fun onInitResult(p0: LMEnum.InitState?, p1: String?) {
-        DLog.e("bjj Beacone >> onInitResult = ${p0?.value()}, $p1, $m_positioningEngine")
+        DLog.e("bjj Beacone onInitResult = ${p0?.value()}, $p1, $m_positioningEngine")
 
         m_positioningEngine?.start()
         var alBeacon: ArrayList<LMBeacon> = ArrayList()
@@ -1966,21 +1964,18 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
                 beacon.activeRange = 20.0F
                 beacon.txPower = -65
                 beacon.checkIn = "Y"
-//                beacon.name = "0007790DE515"
-//                beacon.macAddress = "0007790DE515"
-
                 beacon.name = mBeaconInfo!!.get(i).macAddress
                 beacon.macAddress = mBeaconInfo!!.get(i).macAddress
 
                 alBeacon.add(beacon)
 
-                DLog.e("bjj Beacone >> onInitResult find beacon :: "
+                DLog.e("bjj Beacone onInitResult find beacon :: "
                         + i + " ^ "
                         + mBeaconInfo!!.get(i).macAddress)
             }
         }
 
-        DLog.e("bjj Beacone >> onInitResult::addBeacon() size = ${alBeacon.size}")
+        DLog.e("bjj Beacone onInitResult addBeacon() size = ${alBeacon.size}")
 
         m_positioningEngine?.addBeaconList(alBeacon)
     }
@@ -1999,43 +1994,40 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         scanFilters = Vector<ScanFilter>()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mBluetoothLeScanner = mBluetoothAdapter!!.bluetoothLeScanner
-            mScanSettings = ScanSettings.Builder()
-            mScanSettings!!.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+        mBluetoothLeScanner = mBluetoothAdapter!!.bluetoothLeScanner
+        mScanSettings = ScanSettings.Builder()
+        mScanSettings!!.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
 
-            val scanSettings: ScanSettings = mScanSettings!!.build()
+        val scanSettings: ScanSettings = mScanSettings!!.build()
 
-            mScanCallback = object : ScanCallback() {
-                override fun onScanResult(callbackType: Int, result: ScanResult) {
-                    super.onScanResult(callbackType, result)
+        mScanCallback = object : ScanCallback() {
+            override fun onScanResult(callbackType: Int, result: ScanResult) {
+                super.onScanResult(callbackType, result)
 
-                    try {
-                        val mac = result.device.address.replace(":", "")
+                try {
+                    val mac = result.device.address.replace(":", "")
 
-                        if (mBeaconInfo != null) {
-                            for (i in mBeaconInfo!!.indices) {
+                    if (mBeaconInfo != null) {
+                        for (i in mBeaconInfo!!.indices) {
+                            if (mac == mBeaconInfo!!.get(i).macAddress) {
+                                if (GasBleData.isGalBleData(result.scanRecord!!.bytes)) {
+                                    // make gasBLE data
+                                    makeGasBleData(result.scanRecord!!.bytes, mBeaconInfo!!.get(i).macAddress!!)
 
-                                if (mac == mBeaconInfo!!.get(i).macAddress) {
-                                    if (GasBleData.isGalBleData(result.scanRecord!!.bytes)) {
-                                        // make gasBLE data
-                                        makeGasBleData(result.scanRecord!!.bytes, mBeaconInfo!!.get(i).macAddress!!)
-
-                                        DLog.e("bjj Beacone aaaaaaaaaaaaaa bb >> initGasBle match : "
-                                                + i + " ^ "
-                                                + mBeaconInfo!!.get(i).macAddress)
-                                    }
+                                    DLog.e("bjj Beacone initGasBle match : "
+                                            + i + " ^ "
+                                            + mBeaconInfo!!.get(i).macAddress)
                                 }
                             }
                         }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
                     }
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
             }
-
-            mBluetoothLeScanner!!.startScan(scanFilters, scanSettings, mScanCallback)
         }
+
+        mBluetoothLeScanner!!.startScan(scanFilters, scanSettings, mScanCallback)
     }
 
     private fun makeGasBleData(scanRecord: ByteArray?, mac: String) {
