@@ -173,6 +173,15 @@ data class BleInfo(
     }
 }
 
+data class GyroscopeInfo(
+        @SerializedName("x") val x: String,
+        @SerializedName("y") val y: String,
+@SerializedName("z") val z: String
+) {
+    fun toJsonString(): String {
+        return gson().toJson(this)
+    }
+}
 
 data class BeaconMacInfo(
         @SerializedName("result") val result: BeaconInterfaceData

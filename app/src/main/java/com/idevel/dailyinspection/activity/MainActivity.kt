@@ -12,6 +12,7 @@ import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.hardware.Sensor
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationListener
@@ -86,6 +87,9 @@ import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.system.exitProcess
+import android.hardware.SensorManager
+import android.hardware.SensorEventListener
+import android.hardware.SensorEvent
 
 
 /**
@@ -178,6 +182,61 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
         if (nfcAdapter == null) {
             Toast.makeText(this, "NO NFC Capabilities", Toast.LENGTH_SHORT).show()
         }
+
+        mSensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        myGySensor = mSensorManager!!.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
+
+        myGyListener = object : SensorEventListener {
+            override fun onSensorChanged(event: SensorEvent?) {
+                //            val accX = event.values[0].toDouble()
+//            val accY = event.values[1].toDouble()
+//            val accZ = event.values[2].toDouble()
+//            val x = String.format("%.3f", accX).toDouble()
+//            val y = String.format("%.3f", accY).toDouble()
+//            val z = String.format("%.3f", accZ).toDouble()
+//            val sum = x * x + y * y + z * z
+//            var root = Math.sqrt(sum)
+//            root = String.format("%.3f", root).toDouble()
+//            text_x.setText("X : $x")
+//            text_y.setText("Y : $y")
+//            text_z.setText("Z : $z")
+//            text_vector.setText("Vector : $root")
+//            val angleXZ = Math.atan2(accX, accZ) * 180 / Math.PI
+//            val angleYZ = Math.atan2(accY, accZ) * 180 / Math.PI
+//            Log.e("LOG", "ACCELOMETER           [X]:" + String.format("%.4f", event.values[0]) + "           [Y]:" + String.format("%.4f", event.values[1]) + "           [Z]:" + String.format("%.4f", event.values[2]) + "           [angleXZ]: " + String.format("%.4f", angleXZ) + "           [angleYZ]: " + String.format("%.4f", angleYZ))
+
+                /* 각 축의 각속도 성분을 받는다. */
+                if (event == null) {
+                    return
+                }
+
+                /* 각 축의 각속도 성분을 받는다. */
+                if (event.sensor.type != Sensor.TYPE_GYROSCOPE) {
+                    return
+                }
+
+                val accX = event.values[0].toDouble()
+                val accY = event.values[1].toDouble()
+                val accZ = event.values[2].toDouble()
+                val x = String.format("%.2f", accX).toDouble()
+                val y = String.format("%.2f", accY).toDouble()
+                val z = String.format("%.2f", accZ).toDouble()
+
+                mPitch = Math.abs(x)
+                mRoll = Math.abs(y)
+                mYaw = Math.abs(z)
+
+//                DLog.e("bjj myGyListener :: "
+//                        + event.sensor.type + "^"
+//                        + x + "^"
+//                        + y + "^"
+//                        + z)
+            }
+
+            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+            }
+
+        }
     }
 
     private fun goToDevActivity() {
@@ -240,6 +299,11 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
 
         //battery
         registerReceiver(batteryReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+
+        //gyroscopeSensor
+        startGyroscopeSensor()
+
+        mSensorManager?.registerListener(myGyListener, myGySensor, SensorManager.SENSOR_DELAY_UI)
     }
 
     override fun onPause() {
@@ -262,6 +326,9 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
         } catch (ex: IllegalStateException) {
             DLog.e("bjj Error disabling NFC foreground dispatch" + ex)
         }
+
+        stopGyroscopeSensor()
+        mSensorManager?.unregisterListener(myGyListener)
     }
 
     private fun checkSettingInfo() {
@@ -1918,6 +1985,8 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
         if (p0 != null) {
             DLog.e("bjj Beacone onCheckOut = " + p0.toString())
 
+            Toast.makeText(this, "Beacon onCheckOut", Toast.LENGTH_SHORT).show()
+
             mWebview?.sendEvent(IdevelServerScript.SET_BEACON_ON_CHECK_OUT, BeaconInfo(p0.toString()).toJsonString())
         }
     }
@@ -1926,6 +1995,8 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
     override fun onCheckIn(p0: LMBeacon?) {
         if (p0 != null) {
             DLog.e("bjj Beacone onCheckIn = " + p0.toString())
+
+            Toast.makeText(this, "Beacon onCheckIn", Toast.LENGTH_SHORT).show()
 
             mWebview?.sendEvent(IdevelServerScript.SET_BEACON_ON_CHECK_IN, BeaconInfo(p0.toString()).toJsonString())
         }
@@ -1936,6 +2007,8 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
         if (p0 != null) {
             if (p0.size > 0) {
                 DLog.e("bjj Beacone onNearBy = get ${p0.size} ^ ${p0[0]}")
+
+                Toast.makeText(this, "Beacon onNearBy", Toast.LENGTH_SHORT).show()
 
                 mWebview?.sendEvent(IdevelServerScript.SET_BEACON_NEAR_BY, BeaconInfo(p0[0].toString()).toJsonString())
             }
@@ -2096,5 +2169,41 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
                 + ", Humidity : " + strHumidity
                 + ", Emergency : " + isEmergency
         )
+    }
+
+    private var bleTimer: Timer? = null
+    private var bleTimerTask: TimerTask? = null
+
+    private var mSensorManager: SensorManager? = null
+    private var myGyListener: SensorEventListener? = null
+    private var myGySensor: Sensor? = null
+    private var mPitch: Double = 0.0
+    private var mRoll: Double = 0.0
+    private var mYaw: Double = 0.0
+
+    private fun startGyroscopeSensor() {
+        stopGyroscopeSensor()
+
+        bleTimer = Timer()
+        bleTimerTask = object : TimerTask() {
+            override fun run() {
+                DLog.e("bjj startGyroscopeSensor "
+                        + mPitch.toString() + " ^ "
+                        + mRoll.toString() + " ^ "
+                        + mYaw.toString())
+
+                mWebview?.sendEvent(IdevelServerScript.SET_GYROSCOPE, GyroscopeInfo(
+                        mPitch.toString(),
+                        mRoll.toString(),
+                        mYaw.toString()).toJsonString())
+            }
+        }
+
+        bleTimer!!.schedule(bleTimerTask, 0, 1000)
+    }
+
+    private fun stopGyroscopeSensor() {
+        bleTimerTask?.cancel()
+        bleTimer?.cancel()
     }
 }
