@@ -31,7 +31,10 @@ object SharedPreferencesUtil {
 
         AUTO_LOGIN,
         AUTO_LOGIN_ID,
-        AUTO_LOGIN_PW
+        AUTO_LOGIN_PW,
+
+
+        QR_FLASH
     }
 
     /**

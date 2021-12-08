@@ -14,6 +14,10 @@ import com.google.zxing.integration.android.IntentResult
 import com.idevel.dailyinspection.BuildConfig
 import com.idevel.dailyinspection.R
 import com.idevel.dailyinspection.utils.DLog
+import com.idevel.dailyinspection.utils.MessageEvent
+import com.idevel.dailyinspection.utils.RxBus
+import com.idevel.dailyinspection.utils.SharedPreferencesUtil
+import io.reactivex.disposables.Disposable
 import java.util.*
 
 
@@ -23,6 +27,9 @@ class QrcodeScanActivity : AppCompatActivity() {
         const val IS_MANUAL = "IS_MANUAL"
         const val WEB_URL = "WEB_URL"
         const val CALL_BACK = "CALL_BACK"
+
+
+        const val RESTART = "RESTART"
     }
 
     private var myWebview: WebView? = null
@@ -49,6 +56,8 @@ class QrcodeScanActivity : AppCompatActivity() {
         }
 
         showScanner()
+
+        registRXListener()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -89,6 +98,8 @@ class QrcodeScanActivity : AppCompatActivity() {
             it.clearHistory()
             it.destroy()
         }
+
+        removeRXListener()
     }
 
     override fun onBackPressed() {
@@ -148,9 +159,13 @@ class QrcodeScanActivity : AppCompatActivity() {
         integrator.setPrompt("QR코드를 사각형 안에 비춰주세요.")
 
         val isFlash = intent.getBooleanExtra(IS_FLASH, false)
+        SharedPreferencesUtil.setBoolean(this@QrcodeScanActivity, SharedPreferencesUtil.Cmd.QR_FLASH, isFlash)
+
         if (isFlash) {
             integrator.setTorchEnabled(true)
         }
+
+        DLog.e("bjj QrcodeScanActivity showScanner "+isFlash)
 
         integrator.initiateScan()
     }
@@ -190,5 +205,39 @@ class QrcodeScanActivity : AppCompatActivity() {
         builder.show()
 
         return true
+    }
+
+    private var mListener: Disposable? = null
+    private fun registRXListener() {
+        mListener = RxBus.listen(MessageEvent::class.java).doOnError {
+        }.subscribe {
+            DLog.e("bjj QrcodeScanActivity RxBus.listen : " + "${it.eventType}")
+
+            when (it.eventType) {
+                MessageEvent.MessageType.MT_FLASH_ON -> {
+                    DLog.e("bjj QrcodeScanActivity MT_FLASH_ON ")
+
+                    val i = Intent()
+                    i.putExtra(RESTART, "FLASH_ON")
+                    setResult(RESULT_CANCELED, i)
+
+                    finish()
+                }
+                MessageEvent.MessageType.MT_FLASH_OFF -> {
+                    DLog.e("bjj QrcodeScanActivity MT_FLASH_OFF ")
+
+                    val i = Intent()
+                    i.putExtra(RESTART, "FLASH_OFF")
+                    setResult(RESULT_CANCELED, i)
+
+                    finish()
+                }
+            }
+        }
+    }
+
+    private fun removeRXListener() {
+        mListener?.dispose()
+        mListener = null
     }
 }

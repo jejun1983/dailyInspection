@@ -7,10 +7,15 @@ import android.view.Gravity
 import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
+import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.idevel.dailyinspection.R
+import com.idevel.dailyinspection.utils.DLog
+import com.idevel.dailyinspection.utils.MessageEvent
+import com.idevel.dailyinspection.utils.RxBus
+import com.idevel.dailyinspection.utils.SharedPreferencesUtil
 import com.journeyapps.barcodescanner.CaptureActivity
 import com.journeyapps.barcodescanner.ViewfinderView
 import java.lang.reflect.Field
@@ -33,7 +38,7 @@ class QrcodeCaptureActivity : CaptureActivity() {
         titleText.layoutParams = LinearLayout.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
         titleText.setTextColor(Color.parseColor("#ffffff"))
         titleText.setBackgroundColor(Color.parseColor("#929292"))
-        titleText.text = resources.getString(R.string.app_name)+" QR 코드 등록"
+        titleText.text = resources.getString(R.string.app_name) + " QR 코드 등록"
         titleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
         titleText.gravity = Gravity.CENTER
 
@@ -44,15 +49,27 @@ class QrcodeCaptureActivity : CaptureActivity() {
         titleBtnParam.topMargin = (10 * dm.density).roundToInt()
         titleBtnParam.leftMargin = (5 * dm.density).roundToInt()
 
-//        val titleBtn = Button(this)
-//        titleBtn.setBackgroundResource(R.drawable.x_btn_back_01)
-//        titleBtn.bringToFront()
-//
-//        addContentView(titleBtn, titleBtnParam)
 
-//        titleBtn.setOnClickListener {
-//            finish()
-//        }
+        //TODO flash on/off
+        val titleCheckBox = CheckBox(this)
+//        titleCheckBox.setBackgroundResource(R.drawable.con_qr_toggle)
+        titleCheckBox.bringToFront()
+        addContentView(titleCheckBox, titleBtnParam)
+
+        titleCheckBox.isChecked = SharedPreferencesUtil.getBoolean(this@QrcodeCaptureActivity, SharedPreferencesUtil.Cmd.QR_FLASH)
+        titleCheckBox.setOnCheckedChangeListener { view, isChecked ->
+            DLog.e("bjj QrcodeScanActivity aa " + isChecked + " ^ " + view.isShown)
+
+            if(view.isShown){
+                if (isChecked) {
+                    RxBus.publish(MessageEvent(MessageEvent.MessageType.MT_FLASH_ON))
+                } else {
+                    RxBus.publish(MessageEvent(MessageEvent.MessageType.MT_FLASH_OFF))
+                }
+
+                finish()
+            }
+        }
     }
 
     private fun disableLaser() {

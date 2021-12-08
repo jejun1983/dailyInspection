@@ -127,7 +127,7 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
     private var gallery_test_btn: Button? = null
 
     private var nfcAdapter: NfcAdapter? = null
-    private var isQrFlash: Boolean = false
+//    private var isQrFlash: Boolean = false
     private var isNFCenable: Boolean = false
 
     private var m_positioningEngine: IPositioningEngineStub? = null
@@ -587,7 +587,9 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
 //            doTakePhotoAction("profile", "")
 
             val intent = Intent(this@MainActivity, QrcodeScanActivity::class.java)
-            intent.putExtra(QrcodeScanActivity.IS_FLASH, isQrFlash)
+
+            val isFlash = SharedPreferencesUtil.getBoolean(this@MainActivity, SharedPreferencesUtil.Cmd.QR_FLASH)
+            intent.putExtra(QrcodeScanActivity.IS_FLASH, isFlash)
 
             startActivityForResult(intent, REQUEST_QRSCAN_ACTIVITY)
         }
@@ -1006,7 +1008,25 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
                         mWebview?.sendEvent(IdevelServerScript.OPEN_QR, QrInfo(qrResult).toJsonString())
                     }
                 } else {
-                    mWebview?.sendEvent(IdevelServerScript.OPEN_QR, QrInfo("").toJsonString())
+                    val qrResult = intent?.getStringExtra(QrcodeScanActivity.RESTART)
+
+                    DLog.e("bjj QrcodeScanActivity RESULT_CANCELED " + qrResult)
+
+                    if (qrResult.isNullOrEmpty()) {
+                        mWebview?.sendEvent(IdevelServerScript.OPEN_QR, QrInfo("").toJsonString())
+                    } else {
+                        Handler().postDelayed({
+                            val intent = Intent(this@MainActivity, QrcodeScanActivity::class.java)
+
+                            if (qrResult == "FLASH_ON") {
+                                intent.putExtra(QrcodeScanActivity.IS_FLASH, true)
+                            } else {
+                                intent.putExtra(QrcodeScanActivity.IS_FLASH, false)
+                            }
+
+                            startActivityForResult(intent, REQUEST_QRSCAN_ACTIVITY)
+                        }, 300L)
+                    }
                 }
             }
         }
@@ -1250,14 +1270,16 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
 
         override fun setQrFlash(isBool: Boolean) {
             (this@MainActivity as Activity).runOnUiThread {
-                isQrFlash = isBool
+//                isQrFlash = isBool
             }
         }
 
         override fun openQR() {
             (this@MainActivity as Activity).runOnUiThread {
                 val intent = Intent(this@MainActivity, QrcodeScanActivity::class.java)
-                intent.putExtra(QrcodeScanActivity.IS_FLASH, isQrFlash)
+
+                val isFlash = SharedPreferencesUtil.getBoolean(this@MainActivity, SharedPreferencesUtil.Cmd.QR_FLASH)
+                intent.putExtra(QrcodeScanActivity.IS_FLASH, isFlash)
 
                 startActivityForResult(intent, REQUEST_QRSCAN_ACTIVITY)
             }
