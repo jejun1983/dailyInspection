@@ -1025,7 +1025,7 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
                             }
 
                             startActivityForResult(intent, REQUEST_QRSCAN_ACTIVITY)
-                        }, 300L)
+                        }, 0L)
                     }
                 }
             }

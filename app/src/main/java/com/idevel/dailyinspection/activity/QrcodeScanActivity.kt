@@ -156,8 +156,7 @@ class QrcodeScanActivity : AppCompatActivity() {
         integrator.setBeepEnabled(false)
         integrator.setOrientationLocked(false)
         integrator.captureActivity = QrcodeCaptureActivity::class.java
-        integrator.setPrompt("QR코드를 사각형 안에 비춰주세요.")
-
+        integrator.setPrompt("QR코드를 인식해서 설비를 인식시켜주세요")
         val isFlash = intent.getBooleanExtra(IS_FLASH, false)
         SharedPreferencesUtil.setBoolean(this@QrcodeScanActivity, SharedPreferencesUtil.Cmd.QR_FLASH, isFlash)
 

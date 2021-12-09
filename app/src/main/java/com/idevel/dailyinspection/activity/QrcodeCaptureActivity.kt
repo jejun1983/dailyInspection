@@ -7,10 +7,7 @@ import android.view.Gravity
 import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
-import android.widget.CheckBox
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.*
 import com.idevel.dailyinspection.R
 import com.idevel.dailyinspection.utils.DLog
 import com.idevel.dailyinspection.utils.MessageEvent
@@ -20,6 +17,7 @@ import com.journeyapps.barcodescanner.CaptureActivity
 import com.journeyapps.barcodescanner.ViewfinderView
 import java.lang.reflect.Field
 import kotlin.math.roundToInt
+import android.widget.RelativeLayout
 
 
 class QrcodeCaptureActivity : CaptureActivity() {
@@ -37,30 +35,37 @@ class QrcodeCaptureActivity : CaptureActivity() {
         val titleText = TextView(this)
         titleText.layoutParams = LinearLayout.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
         titleText.setTextColor(Color.parseColor("#ffffff"))
-        titleText.setBackgroundColor(Color.parseColor("#929292"))
-        titleText.text = resources.getString(R.string.app_name) + " QR 코드 등록"
+        titleText.setBackgroundColor(Color.parseColor("#17244C"))
+        titleText.text = resources.getString(R.string.app_name) + " QR 코드 점검"
         titleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
         titleText.gravity = Gravity.CENTER
 
         addContentView(titleText, params)
 
-        val titleBtnSize = (30 * dm.density).roundToInt()
-        val titleBtnParam = RelativeLayout.LayoutParams(titleBtnSize, titleBtnSize)
-        titleBtnParam.topMargin = (10 * dm.density).roundToInt()
-        titleBtnParam.leftMargin = (5 * dm.density).roundToInt()
 
+        //checkBox add s
+        val lButtonParams = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
+        lButtonParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+        lButtonParams.addRule(RelativeLayout.CENTER_HORIZONTAL)
+        lButtonParams.bottomMargin = (100 * dm.density).roundToInt()
 
-        //TODO flash on/off
         val titleCheckBox = CheckBox(this)
-//        titleCheckBox.setBackgroundResource(R.drawable.con_qr_toggle)
-        titleCheckBox.bringToFront()
-        addContentView(titleCheckBox, titleBtnParam)
+        titleCheckBox.setButtonDrawable(R.drawable.con_qr_toggle)
+        titleCheckBox.layoutParams = lButtonParams
+
+        val lContainerLayout = RelativeLayout(this)
+        lContainerLayout.layoutParams = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT)
+        lContainerLayout.addView(titleCheckBox)
+
+        addContentView(lContainerLayout, lContainerLayout.layoutParams)
+        //checkBox add e
+
 
         titleCheckBox.isChecked = SharedPreferencesUtil.getBoolean(this@QrcodeCaptureActivity, SharedPreferencesUtil.Cmd.QR_FLASH)
         titleCheckBox.setOnCheckedChangeListener { view, isChecked ->
             DLog.e("bjj QrcodeScanActivity aa " + isChecked + " ^ " + view.isShown)
 
-            if(view.isShown){
+            if (view.isShown) {
                 if (isChecked) {
                     RxBus.publish(MessageEvent(MessageEvent.MessageType.MT_FLASH_ON))
                 } else {
