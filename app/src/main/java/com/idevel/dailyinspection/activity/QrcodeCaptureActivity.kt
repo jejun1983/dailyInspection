@@ -51,6 +51,9 @@ class QrcodeCaptureActivity : CaptureActivity() {
 
         val titleCheckBox = CheckBox(this)
         titleCheckBox.setButtonDrawable(R.drawable.con_qr_toggle)
+        titleCheckBox.scaleX = 4.0f
+        titleCheckBox.scaleY = 4.0f
+//        titleCheckBox.setBackgroundColor(Color.parseColor("#17244C"))
         titleCheckBox.layoutParams = lButtonParams
 
         val lContainerLayout = RelativeLayout(this)
