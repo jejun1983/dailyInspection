@@ -28,7 +28,7 @@ class QrcodeCaptureActivity : CaptureActivity() {
         super.onCreate(savedInstanceState)
 
         val dm = resources.displayMetrics
-        val layoutSize = (50 * dm.density).roundToInt()
+        val layoutSize = (60 * dm.density).roundToInt()
 
         val params = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, layoutSize)
 
@@ -51,8 +51,8 @@ class QrcodeCaptureActivity : CaptureActivity() {
 
         val titleCheckBox = CheckBox(this)
         titleCheckBox.setButtonDrawable(R.drawable.con_qr_toggle)
-        titleCheckBox.scaleX = 4.0f
-        titleCheckBox.scaleY = 4.0f
+        titleCheckBox.scaleX = 3.5f
+        titleCheckBox.scaleY = 3.5f
 //        titleCheckBox.setBackgroundColor(Color.parseColor("#17244C"))
         titleCheckBox.layoutParams = lButtonParams
 
