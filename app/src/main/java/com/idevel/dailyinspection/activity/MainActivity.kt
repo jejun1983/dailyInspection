@@ -127,7 +127,6 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
     private var gallery_test_btn: Button? = null
 
     private var nfcAdapter: NfcAdapter? = null
-//    private var isQrFlash: Boolean = false
     private var isNFCenable: Boolean = false
 
     private var m_positioningEngine: IPositioningEngineStub? = null
@@ -268,9 +267,7 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
             }
         } else {
             // NFC
-            if (NfcAdapter.ACTION_TAG_DISCOVERED == intent.getAction() ||
-                    NfcAdapter.ACTION_TECH_DISCOVERED == intent.getAction() ||
-                    NfcAdapter.ACTION_NDEF_DISCOVERED == intent.getAction()) {
+            if (NfcAdapter.ACTION_TAG_DISCOVERED == intent.getAction() || NfcAdapter.ACTION_TECH_DISCOVERED == intent.getAction() || NfcAdapter.ACTION_NDEF_DISCOVERED == intent.getAction()) {
                 showNFC(intent)
             }
         }
@@ -390,14 +387,16 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
             val serverVersion = version.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             val appVersion = getVersionName(this)!!.split("\\.".toRegex())?.dropLastWhile { it.isEmpty() }?.toTypedArray()
 
-            DLog.d("bjj appVersionCal "
-                    + appVersion?.size + " ^ "
-                    + serverVersion[0] + " ^ "
-                    + serverVersion[1] + " ^ "
-                    + serverVersion[2] + " ^ "
-                    + appVersion[0]!! + " ^ "
-                    + appVersion[1]!! + " ^ "
-                    + appVersion[2]!!)
+            DLog.d(
+                "bjj appVersionCal "
+                        + appVersion?.size + " ^ "
+                        + serverVersion[0] + " ^ "
+                        + serverVersion[1] + " ^ "
+                        + serverVersion[2] + " ^ "
+                        + appVersion[0]!! + " ^ "
+                        + appVersion[1]!! + " ^ "
+                        + appVersion[2]!!
+            )
 
             if (Integer.parseInt(appVersion[0] + appVersion[1]) < Integer.parseInt(serverVersion[0] + serverVersion[1])) {
                 //MAJOR
@@ -405,7 +404,8 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
                 showOtherAppVersionDlg()
 
             } else if (Integer.parseInt(appVersion[2]) < Integer.parseInt(serverVersion[2]) &&
-                    Integer.parseInt(appVersion[0] + appVersion[1]) == Integer.parseInt(serverVersion[0] + serverVersion[1])) {
+                Integer.parseInt(appVersion[0] + appVersion[1]) == Integer.parseInt(serverVersion[0] + serverVersion[1])
+            ) {
                 //MINOR
                 DLog.d("bjj appVersionCal MINOR")
                 showOtherAppVersionDlg()
@@ -1040,16 +1040,19 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
             Dexter.withContext(this).withPermissions(MyApplication.PERMISSIONS).withListener(object : MultiplePermissionsListener {
                 override fun onPermissionsChecked(report: MultiplePermissionsReport) {
                     report.let {
-                        DLog.e("bjj PERMISSION checkPermission onPermissionsChecked aa ==>> "
-                                + it.areAllPermissionsGranted() + " ^ "
-                                + it.isAnyPermissionPermanentlyDenied
+                        DLog.e(
+                            "bjj PERMISSION checkPermission onPermissionsChecked aa ==>> "
+                                    + it.areAllPermissionsGranted() + " ^ "
+                                    + it.isAnyPermissionPermanentlyDenied
                         )
 
                         if (it.areAllPermissionsGranted()) { // 모든 권한 허용
                             setMainView()
                         } else if (it.isAnyPermissionPermanentlyDenied) {
-                            DLog.e("bjj PERMISSION checkPermission onPermissionsChecked bb ==>> "
-                                    + Build.VERSION.SDK_INT)
+                            DLog.e(
+                                "bjj PERMISSION checkPermission onPermissionsChecked bb ==>> "
+                                        + Build.VERSION.SDK_INT
+                            )
 
 //                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
 //                                DLog.e("bjj PERMISSION checkPermission onPermissionsChecked bb ==>> "
@@ -1314,6 +1317,8 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
         private val HANDLER_SPLASH = 2 // 스플래시 종료 핸들러.
         private val HANDLER_SPLASH_DELAY = 3 // 스플래시 delay.
 
+        private val HANDLER_BEACON_START = 77 // 비콘시작.
+
         private val DEV_REQUEST_CODE = 1000 // 히든 메뉴에서 돌아왔을 때 flag값.
         private val X_PAY_REQUEST_CODE = 999
         private val KAKAO_LOGIN_REQUEST_CODE = 998
@@ -1356,6 +1361,10 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
                     }
                     HANDLER_SPLASH_DELAY -> {
                         act.showMainView()
+                    }
+                    HANDLER_BEACON_START -> {// 비콘 초기화
+                        act.initBeacon()
+                        act.initGasBle()
                     }
                 }
             }
@@ -1532,7 +1541,8 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
      */
     private fun getGPSLoacation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+        ) {
 
             Toast.makeText(this, "사용자의 위치 정보 권한을 허용하지 않았습니다", Toast.LENGTH_SHORT).show()
             return
@@ -1744,7 +1754,7 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
         DLog.e("bjj uploadFile :: " + filePath + " ^ " + returnParamStr)
 
         mApiManager?.uploadFile(url.toString(), filePath ?: "", filePath ?: "", mCameraReturnType
-                ?: "", returnParamStr ?: "", object : OnResultListener<Any> {
+            ?: "", returnParamStr ?: "", object : OnResultListener<Any> {
             override fun onResult(result: Any, flag: Int) {
                 if (result == null) {
                     return
@@ -1767,13 +1777,21 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
                     uploadInfoData?.fileKey!!
                 }
 
-                mWebview?.sendEvent(IdevelServerScript.GET_REQUEST_FILE_UPLOAD_INFO, ReturnRequestFileUploadInfo(sucessStr, mCameraReturnType
-                        ?: "", mCameraReturnParam ?: "", keyStr).toJsonString())
+                mWebview?.sendEvent(
+                    IdevelServerScript.GET_REQUEST_FILE_UPLOAD_INFO, ReturnRequestFileUploadInfo(
+                        sucessStr, mCameraReturnType
+                            ?: "", mCameraReturnParam ?: "", keyStr
+                    ).toJsonString()
+                )
             }
 
             override fun onFail(error: Any, flag: Int) {
-                mWebview?.sendEvent(IdevelServerScript.GET_REQUEST_FILE_UPLOAD_INFO, ReturnRequestFileUploadInfo("FAIL", mCameraReturnType
-                        ?: "", mCameraReturnParam ?: "", "").toJsonString())
+                mWebview?.sendEvent(
+                    IdevelServerScript.GET_REQUEST_FILE_UPLOAD_INFO, ReturnRequestFileUploadInfo(
+                        "FAIL", mCameraReturnType
+                            ?: "", mCameraReturnParam ?: "", ""
+                    ).toJsonString()
+                )
             }
         })
     }
@@ -1848,15 +1866,17 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
                 var inputStream: InputStream? = null
                 var ost: OutputStream? = null
 
-                DLog.e("bjj saveRecordFile :: INIT :: "
-                        + savedRootFilePath
-                        + " ^ " + sohoDownloadFolder.exists()
-                        + " ^ " + sohoDownloadFolder.path
-                        + " ^ " + sohoDownloadFolder.isDirectory
-                        + " ^ " + sohoDownloadFolder.isFile
-                        + " ^ " + destinationFile.path
-                        + " ^ " + destinationFile.isDirectory
-                        + " ^ " + destinationFile.isFile)
+                DLog.e(
+                    "bjj saveRecordFile :: INIT :: "
+                            + savedRootFilePath
+                            + " ^ " + sohoDownloadFolder.exists()
+                            + " ^ " + sohoDownloadFolder.path
+                            + " ^ " + sohoDownloadFolder.isDirectory
+                            + " ^ " + sohoDownloadFolder.isFile
+                            + " ^ " + destinationFile.path
+                            + " ^ " + destinationFile.isDirectory
+                            + " ^ " + destinationFile.isFile
+                )
                 try {
                     try {
                         inputStream = body.byteStream()
@@ -1881,11 +1901,13 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
                             break
                         }
 
-                        DLog.e("bjj saveRecordFile :: ING "
-                                + destinationFile.path + " ^ "
-                                + destinationFile.length() + " ^ "
-                                + fileSizeDownloaded + " ^ "
-                                + fileSize)
+                        DLog.e(
+                            "bjj saveRecordFile :: ING "
+                                    + destinationFile.path + " ^ "
+                                    + destinationFile.length() + " ^ "
+                                    + fileSizeDownloaded + " ^ "
+                                    + fileSize
+                        )
 
                         ost.write(data, 0, read)
                         fileSizeDownloaded += read.toLong()
@@ -1893,9 +1915,11 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
 
                     ost.flush()
 
-                    DLog.e("bjj saveRecordFile :: DONE "
-                            + destinationFile.path + " ^ "
-                            + destinationFile.length())
+                    DLog.e(
+                        "bjj saveRecordFile :: DONE "
+                                + destinationFile.path + " ^ "
+                                + destinationFile.length()
+                    )
 
                     (this@MainActivity as Activity).runOnUiThread {
                         openFileManager(destinationFile.path, true)
@@ -1977,14 +2001,12 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
 
         for (i in mBeaconInfo!!.indices) {
             DLog.e("bjj Beacone startBeacon : "
-                    + i + " ^ "
-                    + mBeaconInfo!!.size + " ^ "
-                    + mBeaconInfo!!.get(i).macAddress)
+                        + i + " ^ "
+                        + mBeaconInfo!!.size + " ^ "
+                        + mBeaconInfo!!.get(i).macAddress)
         }
 
-        // 비콘 초기화
-        initBeacon()
-        initGasBle()
+        mHandler.sendEmptyMessageDelayed(HANDLER_BEACON_START, 2000L)
     }
 
 
@@ -2064,9 +2086,7 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
 
                 alBeacon.add(beacon)
 
-                DLog.e("bjj Beacone onInitResult find beacon :: "
-                        + i + " ^ "
-                        + mBeaconInfo!!.get(i).macAddress)
+                DLog.e("bjj Beacone onInitResult find beacon :: " + i + " ^ " + mBeaconInfo!!.get(i).macAddress)
             }
         }
 
@@ -2089,11 +2109,11 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         scanFilters = Vector<ScanFilter>()
 
-        mBluetoothLeScanner = mBluetoothAdapter!!.bluetoothLeScanner
+        mBluetoothLeScanner = mBluetoothAdapter?.bluetoothLeScanner
         mScanSettings = ScanSettings.Builder()
-        mScanSettings!!.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+        mScanSettings?.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
 
-        val scanSettings: ScanSettings = mScanSettings!!.build()
+        val scanSettings: ScanSettings? = mScanSettings?.build()
 
         mScanCallback = object : ScanCallback() {
             override fun onScanResult(callbackType: Int, result: ScanResult) {
@@ -2109,9 +2129,7 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
                                     // make gasBLE data
                                     makeGasBleData(result.scanRecord!!.bytes, mBeaconInfo!!.get(i).macAddress!!)
 
-                                    DLog.e("bjj Beacone initGasBle match : "
-                                            + i + " ^ "
-                                            + mBeaconInfo!!.get(i).macAddress)
+                                    DLog.e("bjj Beacone initGasBle match : " + i + " ^ " + mBeaconInfo!!.get(i).macAddress)
                                 }
                             }
                         }
@@ -2122,7 +2140,11 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
             }
         }
 
-        mBluetoothLeScanner!!.startScan(scanFilters, scanSettings, mScanCallback)
+        DLog.e("bjj Beacone initGasBle  " + scanFilters + " ^ " + scanSettings + " ^ " + mScanCallback + " ^ " + mBluetoothLeScanner)
+
+        if (scanSettings != null && mScanCallback != null) {
+            mBluetoothLeScanner?.startScan(scanFilters, scanSettings, mScanCallback)
+        }
     }
 
     private fun makeGasBleData(scanRecord: ByteArray?, mac: String) {
@@ -2176,20 +2198,20 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
 
         resultStrBuffer.append("macAddress:").append(mac)
 
-
         mWebview?.sendEvent(IdevelServerScript.SET_BLE, BleInfo(resultStrBuffer.toString()).toJsonString())
 
         // Put Data Array
         // !@*#&!*@$^!$*!@(#!@$(!@#(!@&#(&!$ <-- Array 혹은 DB에 가공된 Data 수집해 놓고 사용
-        DLog.e("bjj gas makeGasBleData :: "
-                + "O2 : " + strO2
-                + ", CO : " + strCO
-                + ", H2S : " + strCH4
-                + ", CH4 : " + strH2S
-                + ", Battery : " + strBatteryState
-                + ", Tempe : " + strTemperature
-                + ", Humidity : " + strHumidity
-                + ", Emergency : " + isEmergency
+        DLog.e(
+            "bjj gas makeGasBleData :: "
+                    + "O2 : " + strO2
+                    + ", CO : " + strCO
+                    + ", H2S : " + strCH4
+                    + ", CH4 : " + strH2S
+                    + ", Battery : " + strBatteryState
+                    + ", Tempe : " + strTemperature
+                    + ", Humidity : " + strHumidity
+                    + ", Emergency : " + isEmergency
         )
     }
 
@@ -2202,22 +2224,20 @@ class MainActivity : FragmentActivity(), ICheckInListener, IPositioningInfoListe
     private var mPitch: Double = 0.0
     private var mRoll: Double = 0.0
     private var mYaw: Double = 0.0
-
     private fun startGyroscopeSensor() {
         stopGyroscopeSensor()
 
         bleTimer = Timer()
         bleTimerTask = object : TimerTask() {
             override fun run() {
-                DLog.e("bjj startGyroscopeSensor "
-                        + mPitch.toString() + " ^ "
-                        + mRoll.toString() + " ^ "
-                        + mYaw.toString())
+                DLog.e(
+                    "bjj startGyroscopeSensor "
+                            + mPitch.toString() + " ^ "
+                            + mRoll.toString() + " ^ "
+                            + mYaw.toString()
+                )
 
-                mWebview?.sendEvent(IdevelServerScript.SET_GYROSCOPE, GyroscopeInfo(
-                        mPitch.toString(),
-                        mRoll.toString(),
-                        mYaw.toString()).toJsonString())
+                mWebview?.sendEvent(IdevelServerScript.SET_GYROSCOPE, GyroscopeInfo(mPitch.toString(), mRoll.toString(), mYaw.toString()).toJsonString())
             }
         }
 
